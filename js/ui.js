@@ -259,6 +259,12 @@
     $('screen-game').classList.toggle('hidden', name !== 'game');
   }
 
+  // 槽位内实际卡牌的矩形（.slot .pcard 为槽位 92%×94% 且居中）
+  function slotCardRect(slotRect) {
+    const w = slotRect.width * 0.92, h = slotRect.height * 0.94;
+    return { left: slotRect.left + (slotRect.width - w) / 2, top: slotRect.top + (slotRect.height - h) / 2, width: w, height: h };
+  }
+
   // ---------- 对局 ----------
   function startGame() {
     clearTimers();
@@ -404,7 +410,7 @@
       return;
     }
     const startRect = { left: from.left, top: from.top, width: Math.min(44, from.width), height: Math.min(58, from.height) };
-    spawnFly(toView(init), false, startRect, { left: to.left, top: to.top, width: to.width * 0.92, height: to.height * 0.94 }, 'deal', function () {
+    spawnFly(toView(init), false, startRect, slotCardRect(to), 'deal', function () {
       renderBoard(); // 初始牌落桌（盖住文字标签）
       afterInitialCard(first);
     });
@@ -579,7 +585,7 @@
     const fw = who === 'player' ? Math.min(64, from.width) : Math.min(46, from.width);
     const fh = who === 'player' ? Math.min(88, from.height) : Math.min(64, from.height);
     const startRect = { left: from.left, top: from.top, width: fw, height: fh };
-    const endRect = { left: to.left, top: to.top, width: to.width * 0.92, height: to.height * 0.94 };
+    const endRect = slotCardRect(to);
     spawnFly(toView(move.card), false, startRect, endRect, '', function () {
       afterFlyToSlot(who, r, move.slot);
     });
