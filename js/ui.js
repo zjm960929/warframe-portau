@@ -191,7 +191,7 @@
 
   function setTurnText() {
     const el = $('turn-text');
-    el.textContent = state.turn === 'player' ? '你的回合' : '魂主思考中…';
+    el.textContent = state.turn === 'player' ? '天诺的回合' : '魂主思考中…';
     el.className = state.turn === 'player' ? 'turn-me' : 'turn-ai';
     // 回合切换时重渲染我方手牌的明暗状态（静态 HTML 需手动刷新）
     renderHands(-1);
@@ -381,7 +381,7 @@
   function revealAi(aiCard, playerCard) {
     $('frame-ai').innerHTML = cardHtml(toView(aiCard));
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? '你的牌更大，你先手' : '魂主的牌更大，魂主先手';
+    $('draw-msg').textContent = first === 'player' ? '天诺的牌更大，天诺先手' : '魂主的牌更大，魂主先手';
     $('draw-msg').className = 'draw-msg';
     t(function () { beginPlay(first); }, 1400);
   }
@@ -389,7 +389,7 @@
   function finishOpening(aiCard, playerCard) {
     if (!aiCard || !playerCard) { beginPlay('player'); return; }
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? '你的牌更大，你先手' : '魂主的牌更大，魂主先手';
+    $('draw-msg').textContent = first === 'player' ? '天诺的牌更大，天诺先手' : '魂主的牌更大，魂主先手';
     t(function () { beginPlay(first); }, 1400);
   }
 
@@ -620,7 +620,7 @@
     if (r.captured) {
       sound.capture();
       showGain(slotIdx, '抢夺！+0', 'cap');
-      showBanner((who === 'player' ? '你' : '魂主') + '抢走了鬼牌（不摸牌）');
+      showBanner((who === 'player' ? '天诺' : '魂主') + '抢走了鬼牌（不摸牌）');
     } else {
       sound.play();
       if (r.gain > 0) {
@@ -783,7 +783,7 @@
     const outcome = state.result.outcome;
     $('result-title').textContent = outcome === 'player_win' ? '胜利' : (outcome === 'ai_win' ? '惜败' : '平局');
     $('result-title').className = 'result-title ' + outcome;
-    $('result-score').textContent = '你 ' + state.result.player + ' : ' + state.result.ai + ' 魂主';
+    $('result-score').textContent = '天诺 ' + state.result.player + ' : ' + state.result.ai + ' 魂主';
     $('result-overlay').classList.remove('hidden');
     if (outcome === 'player_win') sound.win();
     else if (outcome === 'ai_win') sound.lose();
