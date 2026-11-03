@@ -794,9 +794,10 @@
       });
     });
     $('btn-start').addEventListener('click', function () { tryStartBgm(); startGame(); });
-  // ---------- 规则视频（B站嵌入） ----------
-  const RULES_VIDEO_SRC = 'https://player.bilibili.com/player.html?isOutside=true&aid=117553221341646&bvid=BV191436sE5f&cid=43300489990&p=1&autoplay=0';
+  // ---------- 规则视频（B站嵌入，iframe 代码保持原始形态） ----------
   let bgmPausedForVideo = false; // 打开视频前 BGM 是否在播（关闭视频后据此恢复）
+  // 关闭弹窗时移除 iframe 以停止播放，打开时按原始代码重建
+  const rulesVideoHTML = $('rules-video') ? $('rules-video').outerHTML : '';
 
   function openRulesVideo() {
     const a = $('bgm-audio');
@@ -805,12 +806,13 @@
       bgmPausedForVideo = true;
       a.pause();
     }
-    $('rules-video').src = RULES_VIDEO_SRC;
+    $('rules-video').outerHTML = rulesVideoHTML;
     $('rules-overlay').classList.remove('hidden');
   }
 
   function closeRulesVideo() {
-    $('rules-video').src = 'about:blank';
+    const iframe = $('rules-video');
+    if (iframe) iframe.outerHTML = '<div id="rules-video"></div>'; // 移除 iframe，停止播放
     $('rules-overlay').classList.add('hidden');
     if (bgmPausedForVideo) {
       bgmPausedForVideo = false;
