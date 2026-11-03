@@ -223,7 +223,8 @@
   // ---------- 飞行克隆卡 ----------
   const FLY_DUR = { slow: 490, draw: 430, deal: 360 };
 
-  function spawnFly(view, isBack, from, to, durCls, cb) {
+  // targetEl：落点处真实卡牌的占位元素——克隆卡继承其字号，落地时牌面图案大小无缝衔接
+  function spawnFly(view, isBack, from, to, durCls, cb, targetEl) {
     const layer = $('fly-layer');
     const div = document.createElement('div');
     let cls = 'pcard fly-card ' + (durCls || 'draw');
@@ -231,6 +232,9 @@
     else cls += (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
     div.className = cls;
     div.innerHTML = isBack ? '' : faceInner(view);
+    if (targetEl && window.getComputedStyle) {
+      try { div.style.fontSize = getComputedStyle(targetEl).fontSize; } catch (e) { /* 保持基础字号 */ }
+    }
     // 克隆卡固定为目标尺寸，用 transform 位移+缩放（GPU 合成）飞行，起飞时按起始尺寸等比缩小
     div.style.width = to.width + 'px';
     div.style.height = to.height + 'px';
@@ -480,7 +484,7 @@
         renderDealingHands(revealed);
         i += 1;
         step();
-      });
+      }, placeholder);
     }
     step();
   }
@@ -653,7 +657,7 @@
         engine.insertCard(state, who, r.handIndex, r.capturedCard);
         renderAll();
         continueAfterDraw(who);
-      });
+      }, capGap);
       return;
     }
 
@@ -675,7 +679,7 @@
       engine.insertCard(state, who, r.handIndex, newCard);
       renderAll();
       continueAfterDraw(who);
-    });
+    }, gapEl);
   }
 
   function continueAfterDraw(who) {
