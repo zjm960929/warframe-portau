@@ -28,7 +28,7 @@
 
   function makeJoker() {
     cardSeq += 1;
-    return { id: 'j' + cardSeq, kind: 'joker', rank: 0, suit: null, label: '鬼', symbol: '★', red: true };
+    return { id: 'j' + cardSeq, kind: 'joker', rank: 0, suit: null, label: 'JOKER', symbol: '★', red: true };
   }
 
   function shuffle(arr) {

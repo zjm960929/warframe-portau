@@ -100,12 +100,21 @@
     return { id: c.id, kind: c.kind, rank: c.rank, label: c.label, symbol: c.symbol, red: !!c.red };
   }
 
+  // 标准扑克牌面：对角索引 + 中央大花色；鬼牌竖排 JOKER + 星标
+  function faceInner(view) {
+    if (view.kind === 'joker') {
+      return '<div class="corner tl"><span class="c-suit">★</span></div>' +
+        '<div class="joker-mid"><span>J</span><span>O</span><span>K</span><span>E</span><span>R</span><span class="j-star">★</span></div>' +
+        '<div class="corner br"><span class="c-suit">★</span></div>';
+    }
+    return '<div class="corner tl"><span class="c-rank">' + view.label + '</span><span class="c-suit">' + view.symbol + '</span></div>' +
+      '<div class="pip">' + view.symbol + '</div>' +
+      '<div class="corner br"><span class="c-rank">' + view.label + '</span><span class="c-suit">' + view.symbol + '</span></div>';
+  }
+
   function cardHtml(view, cls) {
     const clsAll = 'pcard ' + (cls || '') + ' ' + (view.red ? 'red' : 'black') + (view.kind === 'joker' ? ' joker' : '');
-    return '<div class="' + clsAll + '">' +
-      '<span class="rank">' + view.label + '</span>' +
-      '<span class="suit">' + view.symbol + '</span>' +
-      '</div>';
+    return '<div class="' + clsAll + '">' + faceInner(view) + '</div>';
   }
 
   function backHtml(cls) { return '<div class="pcard back ' + (cls || '') + '"></div>'; }
@@ -221,7 +230,7 @@
     if (isBack) cls += ' back';
     else cls += (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
     div.className = cls;
-    div.innerHTML = isBack ? '' : '<span class="rank">' + view.label + '</span><span class="suit">' + view.symbol + '</span>';
+    div.innerHTML = isBack ? '' : faceInner(view);
     div.style.left = (from.left + from.width / 2) + 'px';
     div.style.top = (from.top + from.height / 2) + 'px';
     div.style.width = from.width + 'px';

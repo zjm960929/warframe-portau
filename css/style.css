@@ -39,14 +39,16 @@ body {
   z-index: 1;
 }
 
-/* ---------- 卡牌 ---------- */
+/* ---------- 卡牌（标准扑克牌面） ---------- */
 .pcard {
   width: 58px;
   height: 80px;
   border-radius: 6px;
-  background: linear-gradient(160deg, #182052 0%, #0d1230 100%);
-  border: 1px solid rgba(80,220,255,.35);
-  box-shadow: 0 0 8px rgba(53,224,255,.18), inset 0 0 6px rgba(53,224,255,.06);
+  background: linear-gradient(155deg, #ffffff 0%, #f4f2e9 100%);
+  border: 1px solid #c9ced8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+  color: #1a1a22;
+  font-size: 15px;
   position: relative;
   display: flex;
   align-items: center;
@@ -55,23 +57,50 @@ body {
   transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
-.pcard .rank { position: absolute; top: 3px; left: 6px; font-size: 12px; font-weight: 700; }
-.pcard .suit { position: absolute; top: 3px; right: 6px; font-size: 11px; }
-.pcard .center { font-size: 24px; font-weight: 700; }
+/* 对角索引：左上正放、右下镜像 */
+.pcard .corner {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+}
+.pcard .corner.br {
+  top: auto;
+  left: auto;
+  bottom: 2px;
+  right: 3px;
+  transform: rotate(180deg);
+}
+.pcard .corner .c-rank { font-weight: 700; font-size: .82em; }
+.pcard .corner .c-suit { font-size: .7em; }
 
-.pcard.red { color: #ff6b81; }
-.pcard.black { color: #dfe8ff; }
+/* 中央大花色 */
+.pcard .pip { font-size: 1.9em; line-height: 1; }
 
+.pcard.red { color: #d40000; }
+.pcard.black { color: #1a1a22; }
+
+/* 鬼牌：白底红字金边，竖排 JOKER */
 .pcard.joker {
-  border-color: rgba(155,130,255,.65);
-  box-shadow: 0 0 10px rgba(139,123,255,.4), inset 0 0 6px rgba(139,123,255,.12);
-  color: #c9baff;
+  color: #c8102e;
+  border-color: #dcc06a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4), inset 0 0 0 1px rgba(220, 190, 110, .35);
 }
 
-.pcard.sm { width: 46px; height: 64px; }
-.pcard.sm .rank { font-size: 10px; }
-.pcard.sm .suit { font-size: 9px; }
-.pcard.sm .center { font-size: 18px; }
+.pcard .joker-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.12;
+  font-weight: 800;
+  font-size: .8em;
+}
+.pcard .joker-mid .j-star { font-size: 1.9em; margin-top: .12em; }
+
+.pcard.sm { width: 46px; height: 64px; font-size: 12px; }
 
 .pcard.back {
   background: repeating-linear-gradient(45deg, #131a44 0 7px, #0d1230 7px 14px);
@@ -317,10 +346,7 @@ body {
 
 .player-row { padding: 8px 0 4px; }
 
-.player-row .pcard { width: 18vh; height: 25vh; max-width: 127px; max-height: 175px; cursor: pointer; }
-.player-row .pcard .rank { font-size: 16px; }
-.player-row .pcard .suit { font-size: 15px; }
-.player-row .pcard .center { font-size: 32px; }
+.player-row .pcard { width: 18vh; height: 25vh; max-width: 127px; max-height: 175px; font-size: 26px; cursor: pointer; }
 
 /* ---------- 牌槽棋盘（垂直居中，面积放大） ---------- */
 .board {
@@ -656,24 +682,12 @@ body {
   .turnbar { font-size: 16px; padding: 6px 0; }
   .hint-bar { font-size: 13px; }
 
-  .pcard { width: 76px; height: 104px; border-radius: 8px; }
-  .pcard .rank { font-size: 16px; top: 5px; left: 8px; }
-  .pcard .suit { font-size: 14px; top: 5px; right: 8px; }
-  .pcard .center { font-size: 32px; }
-  .pcard.sm { width: 60px; height: 84px; }
-  .pcard.sm .rank { font-size: 13px; }
-  .pcard.sm .suit { font-size: 11px; }
-  .pcard.sm .center { font-size: 24px; }
+  .pcard { width: 76px; height: 104px; border-radius: 8px; font-size: 19px; }
+  .pcard.sm { width: 60px; height: 84px; font-size: 15px; }
 
   .hand-row { gap: 16px; }
-  .player-row .pcard { max-width: 180px; max-height: 248px; }
-  .player-row .pcard .rank { font-size: 22px; }
-  .player-row .pcard .suit { font-size: 20px; }
-  .player-row .pcard .center { font-size: 46px; }
-  .ai-row .pcard { max-width: 165px; max-height: 226px; }
-  .ai-row .pcard .rank { font-size: 17px; }
-  .ai-row .pcard .suit { font-size: 15px; }
-  .ai-row .pcard .center { font-size: 30px; }
+  .player-row .pcard { max-width: 180px; max-height: 248px; font-size: 32px; }
+  .ai-row .pcard { max-width: 165px; max-height: 226px; font-size: 22px; }
 
   .board-inner { gap: 10px; padding: 0 26px; }
   .slot-wrap { max-width: 140px; }
@@ -681,8 +695,6 @@ body {
   .slot-label { font-size: 16px; }
 
   .draw-frame { width: 80px; height: 110px; border-radius: 8px; }
-  .draw-frame .rank { font-size: 16px; }
-  .draw-frame .suit { font-size: 14px; }
   .pool-slot { max-width: 66px; height: 9vw; max-height: 92px; }
   .pool-slot .pcard { border-radius: 8px; }
   .vs { font-size: 24px; }
@@ -707,23 +719,11 @@ body {
   .deck-num { font-size: 26px; }
   .turnbar { font-size: 20px; }
 
-  .pcard { width: 100px; height: 138px; border-radius: 10px; }
-  .pcard .rank { font-size: 21px; top: 7px; left: 11px; }
-  .pcard .suit { font-size: 19px; top: 7px; right: 11px; }
-  .pcard .center { font-size: 44px; }
-  .pcard.sm { width: 80px; height: 112px; }
-  .pcard.sm .rank { font-size: 17px; }
-  .pcard.sm .suit { font-size: 15px; }
-  .pcard.sm .center { font-size: 32px; }
+  .pcard { width: 100px; height: 138px; border-radius: 10px; font-size: 26px; }
+  .pcard.sm { width: 80px; height: 112px; font-size: 20px; }
 
-  .player-row .pcard { max-width: 240px; max-height: 330px; }
-  .player-row .pcard .rank { font-size: 30px; }
-  .player-row .pcard .suit { font-size: 27px; }
-  .player-row .pcard .center { font-size: 62px; }
-  .ai-row .pcard { max-width: 220px; max-height: 302px; }
-  .ai-row .pcard .rank { font-size: 23px; }
-  .ai-row .pcard .suit { font-size: 20px; }
-  .ai-row .pcard .center { font-size: 40px; }
+  .player-row .pcard { max-width: 240px; max-height: 330px; font-size: 42px; }
+  .ai-row .pcard { max-width: 220px; max-height: 302px; font-size: 30px; }
 
   .slot-wrap { max-width: 190px; }
   .slot { max-height: 260px; border-radius: 10px; }
