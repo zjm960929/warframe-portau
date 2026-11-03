@@ -59,7 +59,8 @@
   };
 
   // ---------- 背景音乐 ----------
-  let bgmOn = localStorage.getItem('portau_bgm') !== 'off';
+  // 默认关闭；玩家手动开启后记忆偏好（下次进页面自动播放）
+  let bgmOn = localStorage.getItem('portau_bgm') === 'on';
   let bgmStarted = false;
 
   // 网页加载完成后立即尝试自动播放；被浏览器策略拦截时，退回到「首次任意交互」启动
