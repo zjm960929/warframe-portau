@@ -54,6 +54,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
   transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
@@ -78,12 +79,12 @@ body {
 .pcard .corner .c-suit { font-size: .7em; }
 
 /* 中央大花色 */
-.pcard .pip { font-size: 1.9em; line-height: 1; }
+.pcard .pip { font-size: 1.5em; line-height: 1; }
 
 .pcard.red { color: #d40000; }
 .pcard.black { color: #1a1a22; }
 
-/* 鬼牌：白底红字金边，竖排 JOKER */
+/* 鬼牌：白底红字金边，中央 Tau 星系符号 τ */
 .pcard.joker {
   color: #c8102e;
   border-color: #dcc06a;
@@ -94,11 +95,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1.12;
-  font-weight: 800;
-  font-size: .8em;
+  line-height: 1;
 }
-.pcard .joker-mid .j-star { font-size: 1.9em; margin-top: .12em; }
+.pcard .joker-mid .j-tau { font-size: 1.7em; font-weight: 700; }
+.pcard .joker-mid .j-star { font-size: 1.05em; margin-top: .18em; }
 
 .pcard.sm { width: 46px; height: 64px; font-size: 12px; }
 
@@ -341,6 +341,7 @@ body {
   height: 21.5vh;
   max-width: 112px;
   max-height: 154px;
+  font-size: 15px;
   cursor: default;
 }
 
@@ -687,7 +688,7 @@ body {
 
   .hand-row { gap: 16px; }
   .player-row .pcard { max-width: 180px; max-height: 248px; font-size: 32px; }
-  .ai-row .pcard { max-width: 165px; max-height: 226px; font-size: 22px; }
+  .ai-row .pcard { max-width: 165px; max-height: 226px; font-size: 17px; }
 
   .board-inner { gap: 10px; padding: 0 26px; }
   .slot-wrap { max-width: 140px; }
@@ -723,7 +724,7 @@ body {
   .pcard.sm { width: 80px; height: 112px; font-size: 20px; }
 
   .player-row .pcard { max-width: 240px; max-height: 330px; font-size: 42px; }
-  .ai-row .pcard { max-width: 220px; max-height: 302px; font-size: 30px; }
+  .ai-row .pcard { max-width: 220px; max-height: 302px; font-size: 24px; }
 
   .slot-wrap { max-width: 190px; }
   .slot { max-height: 260px; border-radius: 10px; }
