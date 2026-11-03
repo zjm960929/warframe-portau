@@ -644,6 +644,16 @@ body {
   .pool-slot { height: 14vw; max-height: 70px; }
 }
 
+/* ---------- 无障碍：用户偏好减弱动画时，关闭装饰性动画并加速飞行 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .slot.glow,
+  .slot.glow-cap,
+  .rotate-icon { animation: none; }
+
+  .fly-card { transition-duration: .05s !important; }
+}
+
 /* ---------- 移动端竖屏提示 ---------- */
 .overlay-rotate {
   position: fixed;
