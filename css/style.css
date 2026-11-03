@@ -610,14 +610,18 @@ body {
 
 .fly-card {
   position: absolute;
+  left: 0;
+  top: 0;
   margin: 0;
-  transition: left .32s ease-in, top .32s ease-in, width .32s ease-in, height .32s ease-in;
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform .32s ease-in;
   box-shadow: 0 0 18px rgba(53,224,255,.45);
 }
 
-.fly-card.slow { transition: left .46s ease-in-out, top .46s ease-in-out, width .46s ease-in-out, height .46s ease-in-out; }
-.fly-card.draw { transition: left .36s ease-out, top .36s ease-out, width .36s ease-out, height .36s ease-out; }
-.fly-card.deal { transition: left .28s ease-out, top .28s ease-out, width .28s ease-out, height .28s ease-out; }
+.fly-card.slow { transition: transform .46s ease-in-out; }
+.fly-card.draw { transition: transform .36s ease-out; }
+.fly-card.deal { transition: transform .28s ease-out; }
 
 .banner {
   position: fixed;

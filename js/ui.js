@@ -231,17 +231,20 @@
     else cls += (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
     div.className = cls;
     div.innerHTML = isBack ? '' : faceInner(view);
-    div.style.left = (from.left + from.width / 2) + 'px';
-    div.style.top = (from.top + from.height / 2) + 'px';
-    div.style.width = from.width + 'px';
-    div.style.height = from.height + 'px';
-    div.style.transform = 'translate(-50%,-50%)';
+    // 克隆卡固定为目标尺寸，用 transform 位移+缩放（GPU 合成）飞行，起飞时按起始尺寸等比缩小
+    div.style.width = to.width + 'px';
+    div.style.height = to.height + 'px';
+    div.style.left = '0px';
+    div.style.top = '0px';
+    const sx = (from.left + from.width / 2) + 'px';
+    const sy = (from.top + from.height / 2) + 'px';
+    const ex = (to.left + to.width / 2) + 'px';
+    const ey = (to.top + to.height / 2) + 'px';
+    const s0 = Math.max(0.2, from.width / to.width).toFixed(3);
+    div.style.transform = 'translate(' + sx + ',' + sy + ') translate(-50%,-50%) scale(' + s0 + ')';
     layer.appendChild(div);
     t(function () {
-      div.style.left = (to.left + to.width / 2) + 'px';
-      div.style.top = (to.top + to.height / 2) + 'px';
-      div.style.width = to.width + 'px';
-      div.style.height = to.height + 'px';
+      div.style.transform = 'translate(' + ex + ',' + ey + ') translate(-50%,-50%) scale(1)';
     }, 30);
     t(function () {
       layer.removeChild(div);
