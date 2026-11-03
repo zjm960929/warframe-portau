@@ -21,18 +21,19 @@
       <div class="deco-line"></div>
     </div>
     <div class="panel">
-      <div class="section-label">选择难度</div>
+      <div class="section-label" data-i18n="choose_difficulty">选择难度</div>
       <div class="diff-row">
-        <div class="diff-item" data-d="easy"><div class="diff-name">简单</div></div>
-        <div class="diff-item active" data-d="normal"><div class="diff-name">普通</div></div>
-        <div class="diff-item" data-d="hard"><div class="diff-name">困难</div></div>
+        <div class="diff-item" data-d="easy"><div class="diff-name" data-i18n="diff_easy">简单</div></div>
+        <div class="diff-item active" data-d="normal"><div class="diff-name" data-i18n="diff_normal">普通</div></div>
+        <div class="diff-item" data-d="hard"><div class="diff-name" data-i18n="diff_hard">困难</div></div>
       </div>
       <button class="btn primary" id="btn-start">开始对局</button>
-      <button class="btn ghost" id="btn-rules">规则说明</button>
+      <button class="btn ghost" id="btn-rules" data-i18n="howto">规则说明</button>
+      <button class="btn ghost" id="btn-lang">Switch to English</button>
       <button class="btn ghost" id="btn-bgm">背景音乐：开</button>
       <div class="menu-footer">
-        <span class="author">作者：ZJM</span>
-        <a class="social" href="https://space.bilibili.com/16730771" target="_blank" rel="noopener" title="哔哩哔哩主页">
+        <span class="author" data-i18n="author">作者：ZJM</span>
+        <a class="social" href="https://space.bilibili.com/16730771" target="_blank" rel="noopener" title="哔哩哔哩主页" data-i18n-title="bilibili_title">
           <svg viewBox="0 0 28 24" width="26" height="24" aria-label="bilibili">
             <line x1="8" y1="2" x2="11.2" y2="6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
             <line x1="20" y1="2" x2="16.8" y2="6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
@@ -41,7 +42,7 @@
             <rect x="15.9" y="11" width="2.7" height="6" rx="1.35" fill="currentColor"/>
           </svg>
         </a>
-        <a class="social" href="https://www.douyin.com/user/MS4wLjABAAAAFIQ6-Ww8fODvrsOR2oFTtegpwDnpVq_PKHIUbxkvFSE" target="_blank" rel="noopener" title="抖音主页">
+        <a class="social" href="https://www.douyin.com/user/MS4wLjABAAAAFIQ6-Ww8fODvrsOR2oFTtegpwDnpVq_PKHIUbxkvFSE" target="_blank" rel="noopener" title="抖音主页" data-i18n-title="douyin_title">
           <svg viewBox="0 0 24 24" width="24" height="24" aria-label="douyin">
             <path fill="currentColor" d="M16.6 3c.4 2.2 1.9 3.8 4.1 4v3.1c-1.6 0-3-.5-4.1-1.4v6.4c0 3.4-2.7 6-6 6s-6-2.6-6-6 2.7-6 6-6c.34 0 .67.03 1 .1v3.3c-.31-.1-.65-.16-1-.16-1.6 0-2.9 1.3-2.9 2.9s1.3 2.9 2.9 2.9 2.9-1.3 2.9-2.9V3h3.1z"/>
           </svg>
@@ -53,18 +54,18 @@
   <!-- ========== 对局 ========== -->
   <div class="screen hidden" id="screen-game">
     <div class="topbar">
-      <button class="nav-back" id="btn-back" title="返回主界面">‹</button>
-      <button class="nav-bgm" id="btn-bgm-ingame" title="背景音乐">
+      <button class="nav-back" id="btn-back" title="返回主界面" data-i18n-title="back_title">‹</button>
+      <button class="nav-bgm" id="btn-bgm-ingame" title="背景音乐" data-i18n-title="music_title">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-label="music">
           <path fill="currentColor" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
         </svg>
       </button>
       <div class="side-info">
-        <span class="who">天诺</span>
+        <span class="who" data-i18n="tenno">天诺</span>
         <span class="score player-score" id="score-player">0</span>
       </div>
       <div class="deck-info" id="deck-box">
-        <span class="deck-label">牌堆</span>
+        <span class="deck-label" data-i18n="deck">牌堆</span>
         <span class="deck-num" id="deck-num">0</span>
       </div>
       <div class="side-info">
@@ -88,8 +89,8 @@
     <!-- 开局抽牌 -->
     <div class="overlay" id="opening-overlay">
       <div class="draw-stage" id="draw-stage">
-        <div class="overlay-title">决定先手</div>
-        <div class="overlay-sub">点选一张牌，与魂主比大小，点数大者先手</div>
+        <div class="overlay-title" data-i18n="decide_first">决定先手</div>
+        <div class="overlay-sub" data-i18n="decide_sub">点选一张牌，与魂主比大小，点数大者先手</div>
         <div class="pool-row" id="pool-row"></div>
       </div>
       <div class="draw-result" id="draw-result">
@@ -105,11 +106,11 @@
     <!-- 补救弹窗 -->
     <div class="overlay hidden" id="remedy-overlay">
       <div class="modal">
-        <div class="modal-title">没有可出的牌</div>
-        <div class="modal-sub">选择一个方案</div>
-        <button class="btn primary" id="btn-discard">弃 1 摸 1（-2 分）</button>
-        <button class="btn ghost" id="btn-redraw">重新摸牌（立即结束回合）</button>
-        <button class="btn ghost" id="btn-skip">直接结束回合</button>
+        <div class="modal-title" data-i18n="no_moves">没有可出的牌</div>
+        <div class="modal-sub" data-i18n="choose_option">选择一个方案</div>
+        <button class="btn primary" id="btn-discard" data-i18n="discard1">弃 1 摸 1（-2 分）</button>
+        <button class="btn ghost" id="btn-redraw" data-i18n="redraw">重新摸牌（立即结束回合）</button>
+        <button class="btn ghost" id="btn-skip" data-i18n="end_turn">直接结束回合</button>
       </div>
     </div>
 
@@ -118,8 +119,8 @@
       <div class="modal">
         <div class="result-title" id="result-title">胜利</div>
         <div class="result-score" id="result-score">天诺 0 : 0 魂主</div>
-        <button class="btn primary" id="btn-restart">再来一局</button>
-        <button class="btn ghost" id="btn-home">返回首页</button>
+        <button class="btn primary" id="btn-restart" data-i18n="play_again">再来一局</button>
+        <button class="btn ghost" id="btn-home" data-i18n="main_menu">返回首页</button>
       </div>
     </div>
   </div>
@@ -127,12 +128,12 @@
   <!-- 规则视频弹窗（B站嵌入） -->
   <div class="overlay hidden" id="rules-overlay">
     <div class="modal wide video-modal">
-      <div class="modal-title">规则说明</div>
-      <div class="modal-sub">视频来自 B站 @ZJM</div>
+      <div class="modal-title" data-i18n="howto">规则说明</div>
+      <div class="modal-sub" data-i18n="video_from">视频来自 B站 @ZJM</div>
       <div class="video-wrap">
         <iframe id="rules-video" src="https://player.bilibili.com/player.html?isOutside=true&aid=117553221341646&bvid=BV191436sE5f&cid=43300489990&p=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
       </div>
-      <button class="btn primary" id="btn-rules-close">关闭</button>
+      <button class="btn primary" id="btn-rules-close" data-i18n="close">关闭</button>
     </div>
   </div>
 
@@ -143,8 +144,8 @@
   <div class="overlay-rotate hidden" id="rotate-overlay">
     <div class="rotate-box">
       <div class="rotate-icon">📱</div>
-      <div class="rotate-text">请将设备旋转至横屏游玩</div>
-      <div class="rotate-sub">横屏后此提示会自动消失</div>
+      <div class="rotate-text" data-i18n="rotate_landscape">请将设备旋转至横屏游玩</div>
+      <div class="rotate-sub" data-i18n="rotate_auto">横屏后此提示会自动消失</div>
     </div>
   </div>
 

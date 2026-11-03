@@ -4,6 +4,102 @@
   const Core = window.PortauCore;
   const engine = Core.engine, rules = Core.rules, gameUtil = Core.game, ai = Core.ai;
 
+  // ---------- 多语言 ----------
+  let lang = 'zh';
+  const I18N = {
+    zh: {
+      doc_title: 'PORτAU 波陶',
+      choose_difficulty: '选择难度',
+      diff_easy: '简单', diff_normal: '普通', diff_hard: '困难',
+      start: '开始对局', howto: '规则说明',
+      music_on: '背景音乐：开', music_off: '背景音乐：关',
+      author: '作者：ZJM',
+      back_title: '返回主界面', music_title: '背景音乐',
+      bilibili_title: '哔哩哔哩主页', douyin_title: '抖音主页',
+      tenno: '天诺', hunra: '魂主',
+      deck: '牌堆',
+      tenno_turn: '天诺的回合', hunra_thinking: '魂主思考中…',
+      ai_name: '魂主（{d}）',
+      decide_first: '决定先手',
+      decide_sub: '点选一张牌，与魂主比大小，点数大者先手',
+      hunra_drawing: '对方正在抽牌…',
+      tenno_first: '天诺的牌更大，天诺先手',
+      hunra_first: '魂主的牌更大，魂主先手',
+      no_moves: '没有可出的牌', choose_option: '选择一个方案',
+      discard1: '弃 1 摸 1（-2 分）', redraw: '重新摸牌（立即结束回合）', end_turn: '直接结束回合',
+      victory: '胜利', defeat: '惜败', draw_game: '平局',
+      play_again: '再来一局', main_menu: '返回首页',
+      video_from: '视频来自 B站 @ZJM', close: '关闭',
+      rotate_landscape: '请将设备旋转至横屏游玩', rotate_auto: '横屏后此提示会自动消失',
+      banner_capture: '{w}抢走了鬼牌（不摸牌）',
+      banner_ai_discard: '魂主弃 1 摸 1（-2 分）',
+      banner_ai_redraw: '魂主重新摸牌，回合结束',
+      banner_new_playable: '摸到新牌！可以立即打出',
+      banner_new_unplayable: '新牌无法打出，回合结束',
+      banner_redraw_end: '重新摸牌，回合结束',
+      toast_no_slot: '这张牌当前不能出', toast_highlight: '只能放到高亮槽位',
+      toast_invalid: '无效操作', toast_no_discard: '无法弃牌', toast_deck_low: '牌堆不足',
+      gain_capture: '抢夺！+0',
+      score_line: '{t} {p} : {a} {h}',
+      switch_lang: 'Switch to English'
+    },
+    en: {
+      doc_title: 'PORτAU',
+      choose_difficulty: 'Choose Difficulty',
+      diff_easy: 'Easy', diff_normal: 'Normal', diff_hard: 'Hard',
+      start: 'Start Game', howto: 'How to Play',
+      music_on: 'Music: On', music_off: 'Music: Off',
+      author: 'Author: ZJM',
+      back_title: 'Back to Menu', music_title: 'Music',
+      bilibili_title: 'Bilibili Channel', douyin_title: 'Douyin Channel',
+      tenno: 'TENNO', hunra: 'HUNRA',
+      deck: 'Deck',
+      tenno_turn: "TENNO's Turn", hunra_thinking: 'HUNRA is thinking…',
+      ai_name: 'HUNRA ({d})',
+      decide_first: 'Decide the First Player',
+      decide_sub: 'Pick a card to compare with HUNRA — the higher rank goes first',
+      hunra_drawing: 'HUNRA is drawing…',
+      tenno_first: "TENNO's card is higher — TENNO goes first",
+      hunra_first: "HUNRA's card is higher — HUNRA goes first",
+      no_moves: 'No Legal Moves', choose_option: 'Choose an option',
+      discard1: 'Discard 1 & Draw 1 (−2 pts)', redraw: 'Redraw Hand (ends your turn)', end_turn: 'End Turn',
+      victory: 'Victory', defeat: 'Defeat', draw_game: 'Draw',
+      play_again: 'Play Again', main_menu: 'Main Menu',
+      video_from: 'Video from Bilibili @ZJM', close: 'Close',
+      rotate_landscape: 'Please rotate your device to landscape', rotate_auto: 'This message disappears in landscape',
+      banner_capture: '{w} captured the Joker (no draw)',
+      banner_ai_discard: 'HUNRA discards 1 & draws 1 (−2 pts)',
+      banner_ai_redraw: 'HUNRA redraws its hand; turn ends',
+      banner_new_playable: 'New card is playable — play it now!',
+      banner_new_unplayable: 'New card cannot be played; turn ends',
+      banner_redraw_end: 'Hand redrawn; turn ends',
+      toast_no_slot: 'This card has no legal slot right now', toast_highlight: 'Only highlighted slots are legal',
+      toast_invalid: 'Invalid move', toast_no_discard: 'Cannot discard', toast_deck_low: 'Not enough cards in the deck',
+      gain_capture: 'CAPTURE! +0',
+      score_line: '{t} {p} : {a} {h}',
+      switch_lang: '切换到中文'
+    }
+  };
+  function t(key, vars) {
+    let s = (I18N[lang] && I18N[lang][key]) || I18N.zh[key] || key;
+    if (vars) { for (const k in vars) s = s.split('{' + k + '}').join(vars[k]); }
+    return s;
+  }
+  // 应用到所有带 data-i18n / data-i18n-title 的静态元素；切换按钮显示另一种语言
+  function applyI18n() {
+    if (document.documentElement) document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    document.title = t('doc_title');
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+    });
+    const btnLang = $('btn-lang');
+    if (btnLang) btnLang.textContent = t('switch_lang');
+    syncBgmButtons();
+  }
+
   // ---------- 工具 ----------
   const $ = function (id) { return document.getElementById(id); };
   const timers = new Set();
@@ -21,6 +117,7 @@
   function lsSet(key, value) {
     try { localStorage.setItem(key, value); } catch (e) { /* 忽略，退化为会话内偏好 */ }
   }
+  lang = lsGet('portau_lang') === 'en' ? 'en' : 'zh';
 
   function rect(el) {
     if (!el) return null;
@@ -105,7 +202,7 @@
   // 同步两个音乐开关的显示状态（菜单文字按钮 + 对局内图标按钮）
   function syncBgmButtons() {
     const btnBgm = $('btn-bgm');
-    if (btnBgm) btnBgm.textContent = '背景音乐：' + (bgmOn ? '开' : '关');
+    if (btnBgm) btnBgm.textContent = bgmOn ? t('music_on') : t('music_off');
     const btnIcon = $('btn-bgm-ingame');
     if (btnIcon) btnIcon.classList.toggle('muted', !bgmOn);
   }
@@ -202,7 +299,7 @@
 
   function setTurnText() {
     const el = $('turn-text');
-    el.textContent = state.turn === 'player' ? '天诺的回合' : '魂主思考中…';
+    el.textContent = state.turn === 'player' ? t('tenno_turn') : t('hunra_thinking');
     el.className = state.turn === 'player' ? 'turn-me' : 'turn-ai';
     // 回合切换时重渲染我方手牌的明暗状态（静态 HTML 需手动刷新）
     renderHands();
@@ -297,7 +394,7 @@
     canEndTurn = false;
     // 建局但不发牌：先决定先手，再播发牌动画
     state = engine.createState(difficulty);
-    $('ai-name').textContent = '魂主（' + (difficulty === 'easy' ? '简单' : difficulty === 'hard' ? '困难' : '普通') + '）';
+    $('ai-name').textContent = t('ai_name', { d: t('diff_' + difficulty) });
     $('actionbar').classList.add('hidden');
     $('remedy-overlay').classList.add('hidden');
     $('result-overlay').classList.add('hidden');
@@ -371,7 +468,7 @@
 
   function revealPlayer(playerCard) {
     $('frame-player').innerHTML = cardHtml(toView(playerCard));
-    $('draw-msg').textContent = '对方正在抽牌…';
+    $('draw-msg').textContent = t('hunra_drawing');
     $('draw-msg').className = 'draw-msg drawing';
     t(function () { aiDrawSequence(playerCard); }, 800);
   }
@@ -399,7 +496,7 @@
   function revealAi(aiCard, playerCard) {
     $('frame-ai').innerHTML = cardHtml(toView(aiCard));
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? '天诺的牌更大，天诺先手' : '魂主的牌更大，魂主先手';
+    $('draw-msg').textContent = first === 'player' ? t('tenno_first') : t('hunra_first');
     $('draw-msg').className = 'draw-msg';
     t(function () { beginPlay(first); }, 1400);
   }
@@ -407,7 +504,7 @@
   function finishOpening(aiCard, playerCard) {
     if (!aiCard || !playerCard) { beginPlay('player'); return; }
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? '天诺的牌更大，天诺先手' : '魂主的牌更大，魂主先手';
+    $('draw-msg').textContent = first === 'player' ? t('tenno_first') : t('hunra_first');
     t(function () { beginPlay(first); }, 1400);
   }
 
@@ -548,7 +645,7 @@
       capFlags[card.rank - 1] = true;
     }
     if (!flags.some(function (f) { return f; })) {
-      toast('这张牌当前不能出');
+      toast(t('toast_no_slot'));
       return;
     }
     selectedId = id;
@@ -562,7 +659,7 @@
     if (screen !== 'game' || state.phase !== 'playing') return;
     if (state.turn !== 'player' || animating) return;
     if (!selectedId || !legalFlags[idx]) {
-      if (selectedId) toast('只能放到高亮槽位');
+      if (selectedId) toast(t('toast_highlight'));
       return;
     }
     const card = state.hands.player.find(function (c) { return c.id === selectedId; });
@@ -591,7 +688,7 @@
     const r = engine.playMove(state, who, move, true);
     if (r.error) {
       animating = false;
-      toast('无效操作');
+      toast(t('toast_invalid'));
       return;
     }
     selectedId = null;
@@ -648,8 +745,8 @@
     renderSlotsOnly();
     if (r.captured) {
       sound.capture();
-      showGain(slotIdx, '抢夺！+0', 'cap');
-      showBanner((who === 'player' ? '天诺' : '魂主') + '抢走了鬼牌（不摸牌）');
+      showGain(slotIdx, t('gain_capture'), 'cap');
+      showBanner(t('banner_capture', { w: who === 'player' ? t('tenno') : t('hunra') }));
     } else {
       sound.play();
       if (r.gain > 0) {
@@ -726,7 +823,7 @@
     }
     if (r.capturedCard) engine.insertCard(state, who, r.handIndex, r.capturedCard);
     renderAll();
-    if (r.captured) { sound.capture(); showGain(slotIdx, '抢夺！+0', 'cap'); }
+    if (r.captured) { sound.capture(); showGain(slotIdx, t('gain_capture'), 'cap'); }
     else { sound.play(); if (r.gain > 0) { sound.score(); showGain(slotIdx, '+' + r.gain, r.gain >= 7 ? 'best' : 'normal'); } }
     if (state.phase === 'over') { finish(); return; }
     animating = false;
@@ -749,7 +846,7 @@
         if (r.error) { engine.skipTurn(state); }
         else {
           sound.draw();
-          showBanner('魂主弃 1 摸 1（-2 分）');
+          showBanner(t('banner_ai_discard'));
           renderHands();
           const m2 = ai.playDrawnIfPossible(state, 'ai', r.newCard);
           if (m2) { t(function () { execPlay('ai', m2); }, 350); return; }
@@ -761,7 +858,7 @@
         if (r.error) { engine.skipTurn(state); }
         else {
           sound.draw();
-          showBanner('魂主重新摸牌，回合结束');
+          showBanner(t('banner_ai_redraw'));
           renderAll();
           engine.endTurn(state);
         }
@@ -788,7 +885,7 @@
 
   function doDiscard(id) {
     const r = engine.discardOne(state, 'player', id);
-    if (r.error) { toast('无法弃牌'); return; }
+    if (r.error) { toast(t('toast_no_discard')); return; }
     sound.draw();
     discardMode = false;
     renderAll();
@@ -796,9 +893,9 @@
     if (playable) {
       canEndTurn = true;
       $('actionbar').classList.remove('hidden');
-      showBanner('摸到新牌！可以立即打出');
+      showBanner(t('banner_new_playable'));
     } else {
-      showBanner('新牌无法打出，回合结束');
+      showBanner(t('banner_new_unplayable'));
       engine.endTurn(state);
       setTurnText();
       aiTurn();
@@ -809,9 +906,9 @@
   function finish() {
     animating = false;
     const outcome = state.result.outcome;
-    $('result-title').textContent = outcome === 'player_win' ? '胜利' : (outcome === 'ai_win' ? '惜败' : '平局');
+    $('result-title').textContent = outcome === 'player_win' ? t('victory') : (outcome === 'ai_win' ? t('defeat') : t('draw_game'));
     $('result-title').className = 'result-title ' + outcome;
-    $('result-score').textContent = '天诺 ' + state.result.player + ' : ' + state.result.ai + ' 魂主';
+    $('result-score').textContent = t('score_line', { t: t('tenno'), p: state.result.player, a: state.result.ai, h: t('hunra') });
     $('result-overlay').classList.remove('hidden');
     if (outcome === 'player_win') sound.win();
     else if (outcome === 'ai_win') sound.lose();
@@ -880,6 +977,11 @@
     $('btn-rules-close').addEventListener('click', closeRulesVideo);
     $('btn-bgm').addEventListener('click', function () { toggleBgm(); });
     $('btn-bgm-ingame').addEventListener('click', function () { toggleBgm(); });
+    $('btn-lang').addEventListener('click', function () {
+      lang = lang === 'zh' ? 'en' : 'zh';
+      lsSet('portau_lang', lang);
+      applyI18n();
+    });
 
     // 对局
     $('btn-back').addEventListener('click', function () { clearTimers(); showScreen('menu'); });
@@ -902,11 +1004,11 @@
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
       const r = engine.fullRedraw(state, 'player');
-      if (r.error) { toast('牌堆不足'); return; }
+      if (r.error) { toast(t('toast_deck_low')); return; }
       sound.draw();
       $('remedy-overlay').classList.add('hidden');
       renderAll();
-      showBanner('重新摸牌，回合结束');
+      showBanner(t('banner_redraw_end'));
       engine.endTurn(state);
       setTurnText();
       aiTurn();
@@ -954,7 +1056,7 @@
   }
 
   bind();
-  syncBgmButtons();
+  applyI18n();
 
   // 调试/测试钩子（不影响正常玩法）
   window.__portau = {
