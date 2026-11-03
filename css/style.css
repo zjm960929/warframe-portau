@@ -97,8 +97,7 @@ body {
   align-items: center;
   line-height: 1;
 }
-.pcard .joker-mid .j-tau { font-size: 1.7em; font-weight: 700; }
-.pcard .joker-mid .j-star { font-size: 1.05em; margin-top: .18em; }
+.pcard .joker-mid .j-tau { font-size: 2em; font-weight: 700; }
 
 .pcard.sm { width: 46px; height: 64px; font-size: 12px; }
 

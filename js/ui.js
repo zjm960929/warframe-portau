@@ -103,9 +103,9 @@
   // 标准扑克牌面：对角索引 + 中央大花色；鬼牌中央 Tau 星系符号 τ + 星标
   function faceInner(view) {
     if (view.kind === 'joker') {
-      return '<div class="corner tl"><span class="c-suit">★</span></div>' +
-        '<div class="joker-mid"><span class="j-tau">τ</span><span class="j-star">★</span></div>' +
-        '<div class="corner br"><span class="c-suit">★</span></div>';
+      return '<div class="corner tl"><span class="c-suit">τ</span></div>' +
+        '<div class="joker-mid"><span class="j-tau">τ</span></div>' +
+        '<div class="corner br"><span class="c-suit">τ</span></div>';
     }
     return '<div class="corner tl"><span class="c-rank">' + view.label + '</span><span class="c-suit">' + view.symbol + '</span></div>' +
       '<div class="pip">' + view.symbol + '</div>' +
