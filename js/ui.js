@@ -280,6 +280,12 @@
     return { left: slotRect.left + (slotRect.width - w) / 2, top: slotRect.top + (slotRect.height - h) / 2, width: w, height: h };
   }
 
+  // 槽位棋盘显隐：开局与发牌期间隐藏，发牌完毕淡入升起
+  function setBoardVisible(show) {
+    const b = $('board');
+    if (b) b.classList.toggle('board-show', !!show);
+  }
+
   // ---------- 对局 ----------
   function startGame() {
     clearTimers();
@@ -296,6 +302,7 @@
     $('remedy-overlay').classList.add('hidden');
     $('result-overlay').classList.add('hidden');
     showScreen('game');
+    setBoardVisible(false); // 决定先手与发牌期间不显示牌槽
     renderBoard();
     renderHands();
     $('deck-num').textContent = state.deck.length;
@@ -467,6 +474,7 @@
         animating = false; // 先解锁再渲染，避免手牌按「无法操作」变暗
         renderAll();
         setTurnText();
+        setBoardVisible(true); // 发牌完毕：牌槽淡入升起
         if (state.turn === 'ai') aiTurn();
         else checkPlayerMoves();
         return;
