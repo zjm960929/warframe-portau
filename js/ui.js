@@ -83,7 +83,10 @@
     }
   };
   function tr(key, vars) {
-    let s = (I18N[lang] && I18N[lang][key]) || I18N.zh[key] || key;
+    // 用「键是否存在」判断而非真值判断：空字符串是合法译文（如英文版标题后缀）
+    const dict = I18N[lang] || {};
+    let s = Object.prototype.hasOwnProperty.call(dict, key) ? dict[key]
+      : (Object.prototype.hasOwnProperty.call(I18N.zh, key) ? I18N.zh[key] : key);
     if (vars) { for (const k in vars) s = s.split('{' + k + '}').join(vars[k]); }
     return s;
   }
