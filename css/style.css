@@ -154,7 +154,7 @@ body {
   .diff-name { font-size: 14px; }
   .btn { line-height: 2; margin: 6px auto; font-size: 14px; }
   .hero { margin-bottom: 8px; }
-  .menu-footer { padding-top: 8px; gap: 12px; }
+  .menu-footer { margin-top: 10px; gap: 12px; }
   .menu-footer .author { font-size: 12px; }
   .menu-footer a svg { width: 20px; height: 18px; }
 }
@@ -219,16 +219,13 @@ body {
 
 .diff-name { font-size: 16px; font-weight: 700; line-height: 1.6; }
 
-/* ---------- 菜单底部作者信息 ---------- */
-#screen-menu { padding-bottom: 12px; }
-
+/* ---------- 菜单面板内：作者信息（背景音乐按钮下方） ---------- */
 .menu-footer {
-  margin-top: auto;
+  margin-top: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  padding-top: 16px;
 }
 
 .menu-footer .author { font-size: 13px; color: #8fa3d8; letter-spacing: 1px; }

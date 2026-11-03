@@ -62,19 +62,33 @@
   let bgmOn = localStorage.getItem('portau_bgm') !== 'off';
   let bgmStarted = false;
 
-  function startBgm() {
+  // 网页加载完成后立即尝试自动播放；被浏览器策略拦截时，退回到「首次任意交互」启动
+  function tryStartBgm() {
     if (!bgmOn || bgmStarted) return;
     const a = $('bgm-audio');
     if (!a) return;
     a.volume = 0.3;
-    a.play().then(function () { bgmStarted = true; }).catch(function () { bgmStarted = false; });
+    const p = a.play();
+    if (p && p.then) {
+      p.then(function () { bgmStarted = true; }).catch(function () { bgmStarted = false; });
+    }
   }
+
+  // 移动端 / 平板检测（UA + iPadOS 触屏特征）
+  function isMobileOrTablet() {
+    const ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod|Mobile|Tablet|HarmonyOS/i.test(ua)) return true;
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true; // iPadOS 13+
+    return false;
+  }
+
+  const BILI_VIDEO_URL = 'https://www.bilibili.com/video/BV191436sE5f/';
 
   function toggleBgm() {
     bgmOn = !bgmOn;
     localStorage.setItem('portau_bgm', bgmOn ? 'on' : 'off');
     const a = $('bgm-audio');
-    if (bgmOn) { startBgm(); if (a) a.play().catch(function () {}); }
+    if (bgmOn) { tryStartBgm(); if (a) a.play().catch(function () {}); }
     else if (a) a.pause();
     $('btn-bgm').textContent = '背景音乐：' + (bgmOn ? '开' : '关');
   }
@@ -778,7 +792,7 @@
         difficulty = el.dataset.d;
       });
     });
-    $('btn-start').addEventListener('click', function () { startBgm(); startGame(); });
+    $('btn-start').addEventListener('click', function () { tryStartBgm(); startGame(); });
   // ---------- 规则视频（B站嵌入） ----------
   const RULES_VIDEO_SRC = 'https://player.bilibili.com/player.html?isOutside=true&aid=117553221341646&bvid=BV191436sE5f&cid=43300489990&p=1&autoplay=0';
   let bgmPausedForVideo = false; // 打开视频前 BGM 是否在播（关闭视频后据此恢复）
@@ -804,8 +818,15 @@
     }
   }
 
-  $('btn-rules').addEventListener('click', openRulesVideo);
-  $('btn-rules-close').addEventListener('click', closeRulesVideo);
+    $('btn-rules').addEventListener('click', function () {
+      if (isMobileOrTablet()) {
+        // 手机 / 平板：跳转 B站视频页观看
+        window.open(BILI_VIDEO_URL, '_blank');
+        return;
+      }
+      openRulesVideo();
+    });
+    $('btn-rules-close').addEventListener('click', closeRulesVideo);
     $('btn-bgm').addEventListener('click', function () { toggleBgm(); });
 
     // 对局
@@ -869,10 +890,18 @@
       if (el && el.dataset.idx !== undefined) onDrawTap(parseInt(el.dataset.idx, 10));
     });
 
-    // 首次任意交互后启动背景音乐（浏览器自动播放策略）
-    document.addEventListener('click', function onFirst() {
-      startBgm();
-      document.removeEventListener('click', onFirst);
+    // 背景音乐：加载后立即尝试自动播放；若被浏览器策略拦截，退回到任意首次交互启动
+    tryStartBgm();
+    ['click', 'keydown', 'touchstart'].forEach(function (type) {
+      const fallback = function () {
+        tryStartBgm();
+        ['click', 'keydown', 'touchstart'].forEach(function (t2) {
+          document.removeEventListener(t2, fallback);
+          window.removeEventListener(t2, fallback);
+        });
+      };
+      document.addEventListener(type, fallback);
+      window.addEventListener(type, fallback);
     });
   }
 
