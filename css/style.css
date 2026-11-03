@@ -325,7 +325,15 @@ body {
 .deck-label { font-size: 10px; color: #8fa3d8; }
 .deck-num { font-size: 18px; font-weight: 700; color: #9fd8ff; }
 
-.turnbar { text-align: center; padding: 4px 0; font-size: 14px; letter-spacing: 2px; flex-shrink: 0; }
+.turnbar {
+  text-align: center;
+  padding: 4px 0;
+  font-size: 14px;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  /* 预留文字高度：空文案与有文案等高，避免发牌结束后牌槽区上移 */
+  min-height: calc(1.4em + 8px);
+}
 .turn-me { color: #ffd166; }
 .turn-ai { color: #8fa3d8; }
 
@@ -456,16 +464,7 @@ body {
   100% { opacity: 0; transform: translate(-50%, -18px); }
 }
 
-/* ---------- 提示与操作 ---------- */
-.hint-bar {
-  text-align: center;
-  font-size: 12px;
-  color: #5b6b9e;
-  min-height: 20px;
-  padding: 2px 20px;
-  flex-shrink: 0;
-}
-
+/* ---------- 操作 ---------- */
 .actionbar { display: flex; justify-content: center; padding: 2px 0; flex-shrink: 0; }
 .actionbar .mini { width: 160px; font-size: 13px; line-height: 2; margin: 0 auto; }
 
@@ -699,7 +698,6 @@ body {
   .deck-info { padding: 6px 24px; }
   .deck-num { font-size: 22px; }
   .turnbar { font-size: 16px; padding: 6px 0; }
-  .hint-bar { font-size: 13px; }
 
   .pcard { width: 76px; height: 104px; border-radius: 8px; font-size: 19px; }
   .pcard.sm { width: 60px; height: 84px; font-size: 15px; }

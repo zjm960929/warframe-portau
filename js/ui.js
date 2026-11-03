@@ -281,7 +281,6 @@
     // 建局但不发牌：先决定先手，再播发牌动画
     state = engine.createState(difficulty);
     $('ai-name').textContent = '魂主（' + (difficulty === 'easy' ? '简单' : difficulty === 'hard' ? '困难' : '普通') + '）';
-    $('hint').textContent = '';
     $('actionbar').classList.add('hidden');
     $('remedy-overlay').classList.add('hidden');
     $('result-overlay').classList.add('hidden');
@@ -399,7 +398,6 @@
     $('opening-overlay').classList.add('hidden');
     renderBoard(); // 空桌面（13 个槽位与文字标签可见）
     renderDealingHands({ player: 0, ai: 0 });
-    $('hint').textContent = '';
     animating = true;
     // 顺序：初始牌上桌 → 双方发牌
     const init = engine.drawInitialCard(state);
@@ -757,7 +755,6 @@
       const can = engine.canDiscardOne(state, 'player');
       $('btn-discard').classList.toggle('disabled', !can);
     } else {
-      $('hint').textContent = '点选手牌后再次点击直接出牌（鬼牌需手动选槽），或点击发光槽位放置';
     }
   }
 
@@ -771,7 +768,6 @@
     if (playable) {
       canEndTurn = true;
       $('actionbar').classList.remove('hidden');
-      $('hint').textContent = '新牌可以打出：点击它并选择槽位，或结束回合';
       showBanner('摸到新牌！可以立即打出');
     } else {
       showBanner('新牌无法打出，回合结束');
@@ -873,7 +869,6 @@
       $('remedy-overlay').classList.add('hidden');
       discardMode = true;
       renderHands(-1);
-      $('hint').textContent = '点选一张要弃掉的牌（-2 分）';
     });
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
