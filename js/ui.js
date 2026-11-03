@@ -276,7 +276,8 @@
     renderBoard();
     renderHands(-1);
     $('deck-num').textContent = state.deck.length;
-    setTurnText();
+    // 回合提示留空：发牌完成后再显示（发牌途中不应出现「你的回合」）
+    $('turn-text').textContent = '';
     startOpening();
   }
 
