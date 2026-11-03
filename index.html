@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Portau 波陶</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <img class="bg-img" src="images/bg.jpg" alt="">
+  <div class="bg-scrim"></div>
+  <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="auto"></audio>
+
+  <!-- ========== 主菜单 ========== -->
+  <div class="screen" id="screen-menu">
+    <div class="hero">
+      <div class="title">Portau 波陶</div>
+      <div class="deco-line"></div>
+    </div>
+    <div class="panel">
+      <div class="section-label">选择难度</div>
+      <div class="diff-row">
+        <div class="diff-item" data-d="easy"><div class="diff-name">简单</div></div>
+        <div class="diff-item active" data-d="normal"><div class="diff-name">普通</div></div>
+        <div class="diff-item" data-d="hard"><div class="diff-name">困难</div></div>
+      </div>
+      <button class="btn primary" id="btn-start">开始对局</button>
+      <button class="btn ghost" id="btn-rules">规则说明</button>
+      <button class="btn ghost" id="btn-bgm">背景音乐：开</button>
+    </div>
+  </div>
+
+  <!-- ========== 对局 ========== -->
+  <div class="screen hidden" id="screen-game">
+    <div class="topbar">
+      <button class="nav-back" id="btn-back" title="返回主界面">‹</button>
+      <div class="side-info">
+        <span class="who">你</span>
+        <span class="score player-score" id="score-player">0</span>
+      </div>
+      <div class="deck-info" id="deck-box">
+        <span class="deck-label">牌堆</span>
+        <span class="deck-num" id="deck-num">0</span>
+      </div>
+      <div class="side-info">
+        <span class="who" id="ai-name">魂主（普通）</span>
+        <span class="score ai-score" id="score-ai">0</span>
+      </div>
+    </div>
+
+    <div class="hand-row ai-row" id="ai-hand"></div>
+
+    <div class="board"><div class="board-inner" id="board-inner"></div></div>
+
+    <div class="turnbar"><span id="turn-text" class="turn-me">你的回合</span></div>
+
+    <div class="hand-row player-row" id="player-hand"></div>
+
+    <div class="hint-bar" id="hint"></div>
+    <div class="actionbar hidden" id="actionbar">
+      <button class="btn ghost mini" id="btn-endturn">结束回合</button>
+    </div>
+
+    <!-- 开局抽牌 -->
+    <div class="overlay" id="opening-overlay">
+      <div class="draw-stage" id="draw-stage">
+        <div class="overlay-title">决定先手</div>
+        <div class="overlay-sub">点选一张牌，与魂主比大小，点数大者先手</div>
+        <div class="pool-row" id="pool-row"></div>
+      </div>
+      <div class="draw-result" id="draw-result">
+        <div class="draw-cards">
+          <div class="draw-frame" id="frame-player"></div>
+          <span class="vs">VS</span>
+          <div class="draw-frame" id="frame-ai"></div>
+        </div>
+        <div class="draw-msg" id="draw-msg"></div>
+      </div>
+    </div>
+
+    <!-- 补救弹窗 -->
+    <div class="overlay hidden" id="remedy-overlay">
+      <div class="modal">
+        <div class="modal-title">没有可出的牌</div>
+        <div class="modal-sub">选择一个方案</div>
+        <button class="btn primary" id="btn-discard">弃 1 摸 1（-2 分）</button>
+        <button class="btn ghost" id="btn-redraw">重新摸牌（立即结束回合）</button>
+        <button class="btn ghost" id="btn-skip">直接结束回合</button>
+      </div>
+    </div>
+
+    <!-- 结算 -->
+    <div class="overlay hidden" id="result-overlay">
+      <div class="modal">
+        <div class="result-title" id="result-title">胜利</div>
+        <div class="result-score" id="result-score">你 0 : 0 魂主</div>
+        <button class="btn primary" id="btn-restart">再来一局</button>
+        <button class="btn ghost" id="btn-home">返回首页</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 规则弹窗（全页面共用） -->
+  <div class="overlay hidden" id="rules-overlay">
+    <div class="modal wide">
+      <div class="modal-title">规则说明</div>
+      <div class="rule-block">
+        <div class="rule-h">目标</div>
+        <div class="rule-p">与魂主轮流把牌放入 13 个牌槽（A、2 至 10、J、Q、K），全部填满后得分高者获胜。双方手牌全程互相可见。</div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-h">计分口诀</div>
+        <div class="rule-score-row"><span class="pts p2">2 分</span><span>所放的牌不在任何两张牌之间</span></div>
+        <div class="rule-score-row"><span class="pts p4">4 分</span><span>夹在两张牌之间，但两侧间隔不对称</span></div>
+        <div class="rule-score-row"><span class="pts p7">7 分</span><span>夹在两张牌正中间，两侧间隔对称</span></div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-h">鬼牌（Joker）</div>
+        <div class="rule-li">· 可放入任意空槽，按位置正常计分</div>
+        <div class="rule-li">· 对应点数的普通牌可以盖住它，把鬼牌抢走</div>
+        <div class="rule-li">· 抢鬼牌计 0 分，且该回合不摸牌</div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-h">没有可出的牌时</div>
+        <div class="rule-li">· 弃 1 摸 1：花 2 分弃 1 张再摸 1 张，新牌可立即打出（每回合限一次，分数不足 2 分时不可用）</div>
+        <div class="rule-li">· 重新摸牌：弃掉全部 4 张再摸 4 张，但立即结束回合</div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-h">决定先手</div>
+        <div class="rule-p">开局你先抽 1 张牌，魂主再抽 1 张（同一花色的 A 至 K），点数大者先手。</div>
+      </div>
+      <button class="btn primary" id="btn-rules-close">我知道了</button>
+    </div>
+  </div>
+
+  <!-- 飞行动画层 -->
+  <div id="fly-layer"></div>
+
+  <!-- 竖屏提示（移动端） -->
+  <div class="overlay-rotate hidden" id="rotate-overlay">
+    <div class="rotate-box">
+      <div class="rotate-icon">📱</div>
+      <div class="rotate-text">请将设备旋转至横屏游玩</div>
+      <div class="rotate-sub">横屏后此提示会自动消失</div>
+    </div>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
