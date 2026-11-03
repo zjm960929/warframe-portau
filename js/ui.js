@@ -781,16 +781,31 @@
     $('btn-start').addEventListener('click', function () { startBgm(); startGame(); });
   // ---------- 规则视频（B站嵌入） ----------
   const RULES_VIDEO_SRC = 'https://player.bilibili.com/player.html?isOutside=true&aid=117553221341646&bvid=BV191436sE5f&cid=43300489990&p=1&autoplay=0';
+  let bgmPausedForVideo = false; // 打开视频前 BGM 是否在播（关闭视频后据此恢复）
 
-  $('btn-rules').addEventListener('click', function () {
-    // 打开时注入视频地址，关闭时置空以停止播放
+  function openRulesVideo() {
+    const a = $('bgm-audio');
+    // 视频与 BGM 抢声道：打开视频时自动暂停 BGM，关闭后按原状态恢复
+    if (bgmOn && a && !a.paused) {
+      bgmPausedForVideo = true;
+      a.pause();
+    }
     $('rules-video').src = RULES_VIDEO_SRC;
     $('rules-overlay').classList.remove('hidden');
-  });
-  $('btn-rules-close').addEventListener('click', function () {
+  }
+
+  function closeRulesVideo() {
     $('rules-video').src = 'about:blank';
     $('rules-overlay').classList.add('hidden');
-  });
+    if (bgmPausedForVideo) {
+      bgmPausedForVideo = false;
+      const a = $('bgm-audio');
+      if (bgmOn && a) a.play().catch(function () {});
+    }
+  }
+
+  $('btn-rules').addEventListener('click', openRulesVideo);
+  $('btn-rules-close').addEventListener('click', closeRulesVideo);
     $('btn-bgm').addEventListener('click', function () { toggleBgm(); });
 
     // 对局
