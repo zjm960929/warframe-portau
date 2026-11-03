@@ -91,7 +91,15 @@
     const a = $('bgm-audio');
     if (bgmOn) { tryStartBgm(); if (a) a.play().catch(function () {}); }
     else if (a) a.pause();
-    $('btn-bgm').textContent = '背景音乐：' + (bgmOn ? '开' : '关');
+    syncBgmButtons();
+  }
+
+  // 同步两个音乐开关的显示状态（菜单文字按钮 + 对局内图标按钮）
+  function syncBgmButtons() {
+    const btnBgm = $('btn-bgm');
+    if (btnBgm) btnBgm.textContent = '背景音乐：' + (bgmOn ? '开' : '关');
+    const btnIcon = $('btn-bgm-ingame');
+    if (btnIcon) btnIcon.classList.toggle('muted', !bgmOn);
   }
 
   // ---------- 视图 ----------
@@ -851,6 +859,7 @@
     });
     $('btn-rules-close').addEventListener('click', closeRulesVideo);
     $('btn-bgm').addEventListener('click', function () { toggleBgm(); });
+    $('btn-bgm-ingame').addEventListener('click', function () { toggleBgm(); });
 
     // 对局
     $('btn-back').addEventListener('click', function () { clearTimers(); showScreen('menu'); });
@@ -928,7 +937,7 @@
   }
 
   bind();
-  $('btn-bgm').textContent = '背景音乐：' + (bgmOn ? '开' : '关');
+  syncBgmButtons();
 
   // 调试/测试钩子（不影响正常玩法）
   window.__portau = {
