@@ -110,7 +110,12 @@
     timers.add(id);
     return id;
   }
-  function clearTimers() { timers.forEach(function (id) { clearTimeout(id); }); timers.clear(); }
+  function clearTimers() {
+    timers.forEach(function (id) { clearTimeout(id); });
+    timers.clear();
+    const fl = $('fly-layer');
+    if (fl) fl.innerHTML = ''; // 清掉飞行中的克隆卡，避免残留在其它界面
+  }
 
   // localStorage 在隐私模式/禁用 Cookie 的浏览器下可能抛异常，做安全包装
   function lsGet(key) {
@@ -241,6 +246,11 @@
   let legalFlags = [];
   let captureFlags = [];
   let animating = false;
+  // 动画锁：true 时同步 body.anim 类，禁用对局内按钮（返回/音乐），防止动画中途操作
+  function setAnimating(v) {
+    animating = v;
+    if (document.body) document.body.classList.toggle('anim', v);
+  }
   let discardMode = false;
   let canEndTurn = false;
   let screen = 'menu';
@@ -388,7 +398,7 @@
   // ---------- 对局 ----------
   function startGame() {
     clearTimers();
-    animating = false;
+    setAnimating(false);
     selectedId = null;
     legalFlags = [];
     captureFlags = [];
@@ -516,7 +526,7 @@
     renderBoard(); // 牌槽此时处于隐藏状态（布局占位保留）
     renderDealingHands({ player: 0, ai: 0 });
     $('turn-text').textContent = '';
-    animating = true;
+    setAnimating(true);
     // ① 先为双方发牌；② 发完显示牌槽；③ 过渡结束后初始牌上桌；④ 进入对局
     dealSequence(first, function () {
       renderAll();
@@ -548,7 +558,7 @@
 
   // ④ 解锁输入、显示回合提示、启动回合流程
   function enterPlay(first) {
-    animating = false; // 先解锁再渲染
+    setAnimating(false); // 先解锁再渲染
     setTurnText();
     if (state.turn === 'ai') aiTurn();
     else checkPlayerMoves();
@@ -686,10 +696,10 @@
   // ---------- 出牌 + 延迟摸牌 ----------
   function execPlay(who, move) {
     if (animating) return;
-    animating = true;
+    setAnimating(true);
     const r = engine.playMove(state, who, move, true);
     if (r.error) {
-      animating = false;
+      setAnimating(false);
       toast(tr('toast_invalid'));
       return;
     }
@@ -810,7 +820,7 @@
   }
 
   function continueAfterDraw(who) {
-    animating = false;
+    setAnimating(false);
     engine.endTurn(state);
     setTurnText();
     if (state.turn === 'ai') aiTurn();
@@ -828,7 +838,7 @@
     if (r.captured) { sound.capture(); showGain(slotIdx, tr('gain_capture'), 'cap'); }
     else { sound.play(); if (r.gain > 0) { sound.score(); showGain(slotIdx, '+' + r.gain, r.gain >= 7 ? 'best' : 'normal'); } }
     if (state.phase === 'over') { finish(); return; }
-    animating = false;
+    setAnimating(false);
     engine.endTurn(state);
     setTurnText();
     if (state.turn === 'ai') aiTurn();
@@ -906,7 +916,7 @@
 
   // ---------- 结算 ----------
   function finish() {
-    animating = false;
+    setAnimating(false);
     const outcome = state.result.outcome;
     $('result-title').textContent = outcome === 'player_win' ? tr('victory') : (outcome === 'ai_win' ? tr('defeat') : tr('draw_game'));
     $('result-title').className = 'result-title ' + outcome;
@@ -986,9 +996,9 @@
     });
 
     // 对局
-    $('btn-back').addEventListener('click', function () { clearTimers(); showScreen('menu'); });
+    $('btn-back').addEventListener('click', function () { if (animating) return; clearTimers(); showScreen('menu'); });
     $('btn-restart').addEventListener('click', startGame);
-    $('btn-home').addEventListener('click', function () { clearTimers(); showScreen('menu'); });
+    $('btn-home').addEventListener('click', function () { if (animating) return; clearTimers(); showScreen('menu'); });
     $('btn-endturn').addEventListener('click', function () {
       if (animating || state.turn !== 'player' || !canEndTurn) return;
       canEndTurn = false;

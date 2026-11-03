@@ -275,6 +275,13 @@ body {
 
 .menu-footer a:hover { color: #35e0ff; transform: translateY(-2px); }
 
+/* ---------- 动画期禁用对局内按钮 ---------- */
+body.anim .nav-back,
+body.anim .nav-bgm {
+  pointer-events: none;
+  opacity: .5;
+}
+
 /* ---------- 对局页 ---------- */
 #screen-game {
   display: flex;
