@@ -173,7 +173,7 @@ body {
 /* ---------- 矮屏（手机横屏）紧凑模式：保证作者信息可见 ---------- */
 @media (max-height: 560px) {
   #screen-menu { padding: 10px 20px; }
-  .title { font-size: 34px; letter-spacing: 2px; }
+  .title { font-size: 34px; letter-spacing: 2px; padding-left: 2px; }
   .deco-line { margin-top: 8px; width: 180px; }
   .panel { padding: 12px 18px; }
   .section-label { margin-bottom: 6px; }
@@ -193,6 +193,8 @@ body {
   font-size: 48px;
   font-weight: 700;
   letter-spacing: 4px;
+  /* 补偿字距尾随空隙，保证 flex 居中时字形真正居中 */
+  padding-left: 4px;
   line-height: 1.15;
   color: #ffffff;
   -webkit-text-stroke: 2px #7a0e1e;
@@ -227,6 +229,8 @@ body {
   color: #8fa3d8;
   margin-bottom: 10px;
   letter-spacing: 2px;
+  /* 补偿字距尾随空隙（text-align 居中用 text-indent） */
+  text-indent: 2px;
   text-align: center;
 }
 
@@ -358,6 +362,8 @@ body {
 
 .turnbar {
   text-align: center;
+  /* 补偿字距尾随空隙（text-align 居中用 text-indent） */
+  text-indent: 2px;
   padding: 4px 0;
   font-size: 14px;
   letter-spacing: 2px;
@@ -570,7 +576,7 @@ body {
 }
 .draw-stage.shifted { transform: translateY(-22px); }
 
-.overlay-title { font-size: 26px; font-weight: 700; letter-spacing: 4px; margin-bottom: 6px; text-align: center; }
+.overlay-title { font-size: 26px; font-weight: 700; letter-spacing: 4px; /* 补偿字距尾随空隙 */ padding-left: 4px; margin-bottom: 6px; text-align: center; }
 .overlay-sub { font-size: 13px; color: #8fa3d8; margin-bottom: 20px; text-align: center; }
 
 .pool-row {
@@ -613,7 +619,7 @@ body {
   100% { opacity: 1; }
 }
 
-.vs { font-size: 18px; font-weight: 700; color: #35e0ff; letter-spacing: 2px; }
+.vs { font-size: 18px; font-weight: 700; color: #35e0ff; letter-spacing: 2px; /* 补偿字距尾随空隙 */ padding-left: 2px; }
 
 .draw-msg {
   margin-top: 14px;
@@ -631,7 +637,7 @@ body {
 }
 
 /* ---------- 结算 ---------- */
-.result-title { font-size: 32px; font-weight: 700; text-align: center; letter-spacing: 5px; margin-bottom: 8px; }
+.result-title { font-size: 32px; font-weight: 700; text-align: center; letter-spacing: 5px; /* 补偿字距尾随空隙 */ padding-left: 5px; margin-bottom: 8px; }
 .result-title.player_win { color: #ffd166; text-shadow: 0 0 16px rgba(255,209,102,.5); }
 .result-title.ai_win { color: #ff8f9c; }
 .result-title.draw { color: #9fd8ff; }
@@ -719,7 +725,7 @@ body {
   100% { transform: rotate(90deg); }
 }
 
-.rotate-text { margin-top: 18px; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #dfe8ff; }
+.rotate-text { margin-top: 18px; font-size: 18px; font-weight: 700; letter-spacing: 2px; /* 补偿字距尾随空隙 */ text-indent: 2px; color: #dfe8ff; }
 .rotate-sub { margin-top: 8px; font-size: 13px; color: #8fa3d8; }
 
 /* ---------- 桌面大屏：UI 分级放大，铺满全屏 ---------- */
