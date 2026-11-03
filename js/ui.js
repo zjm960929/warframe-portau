@@ -14,6 +14,14 @@
   }
   function clearTimers() { timers.forEach(function (id) { clearTimeout(id); }); timers.clear(); }
 
+  // localStorage 在隐私模式/禁用 Cookie 的浏览器下可能抛异常，做安全包装
+  function lsGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function lsSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* 忽略，退化为会话内偏好 */ }
+  }
+
   function rect(el) {
     if (!el) return null;
     const r = el.getBoundingClientRect();
@@ -60,7 +68,7 @@
 
   // ---------- 背景音乐 ----------
   // 默认关闭；玩家手动开启后记忆偏好（下次进页面自动播放）
-  let bgmOn = localStorage.getItem('portau_bgm') === 'on';
+  let bgmOn = lsGet('portau_bgm') === 'on';
   let bgmStarted = false;
 
   // 网页加载完成后立即尝试自动播放；被浏览器策略拦截时，退回到「首次任意交互」启动
@@ -87,7 +95,7 @@
 
   function toggleBgm() {
     bgmOn = !bgmOn;
-    localStorage.setItem('portau_bgm', bgmOn ? 'on' : 'off');
+    lsSet('portau_bgm', bgmOn ? 'on' : 'off');
     const a = $('bgm-audio');
     if (bgmOn) { tryStartBgm(); if (a) a.play().catch(function () {}); }
     else if (a) a.pause();
@@ -158,15 +166,10 @@
     $('score-ai').textContent = state.scores.ai;
   }
 
-  function handHtml(hand, who, gapIndex, small) {
+  function handHtml(hand, who, small) {
     let html = '';
     for (let i = 0; i < hand.length; i++) {
       const v = hand[i];
-      if (i === gapIndex) {
-        const gapId = who === 'player' ? 'hand-gap' : 'aihand-gap';
-        html += '<div class="pcard sm gone" id="' + gapId + '"></div>';
-        continue;
-      }
       let cls = (small ? 'sm ' : '');
       if (who === 'player') {
         if (selectedId === v.id) cls += 'selected ';
@@ -186,14 +189,14 @@
     return html;
   }
 
-  function renderHands(gapIndex) {
-    $('player-hand').innerHTML = handHtml(state.hands.player, 'player', gapIndex, false);
-    $('ai-hand').innerHTML = handHtml(state.hands.ai, 'ai', -1, true);
+  function renderHands() {
+    $('player-hand').innerHTML = handHtml(state.hands.player, 'player', false);
+    $('ai-hand').innerHTML = handHtml(state.hands.ai, 'ai', true);
   }
 
   function renderAll() {
     renderBoard();
-    renderHands(-1);
+    renderHands();
     $('deck-num').textContent = state.deck.length;
   }
 
@@ -202,7 +205,7 @@
     el.textContent = state.turn === 'player' ? '天诺的回合' : '魂主思考中…';
     el.className = state.turn === 'player' ? 'turn-me' : 'turn-ai';
     // 回合切换时重渲染我方手牌的明暗状态（静态 HTML 需手动刷新）
-    renderHands(-1);
+    renderHands();
   }
 
   function showGain(slotIdx, text, cls) {
@@ -294,7 +297,7 @@
     $('result-overlay').classList.add('hidden');
     showScreen('game');
     renderBoard();
-    renderHands(-1);
+    renderHands();
     $('deck-num').textContent = state.deck.length;
     // 回合提示留空：发牌完成后再显示（发牌途中不应出现「你的回合」）
     $('turn-text').textContent = '';
@@ -534,7 +537,7 @@
     legalFlags = flags;
     captureFlags = capFlags;
     renderBoard();
-    renderHands(-1);
+    renderHands();
   }
 
   function onSlotTap(idx) {
@@ -607,14 +610,14 @@
       hand.splice(index, 0, { gone: true });
       $('player-hand').innerHTML = hand.map(function (v) {
         if (v.gone) return '<div class="pcard gone" id="hand-gap"></div>';
-        return handHtml([v], 'player', -1, false);
+        return handHtml([v], 'player', false);
       }).join('');
     } else {
       const hand = state.hands.ai.map(toView);
       hand.splice(index, 0, { gone: true });
       $('ai-hand').innerHTML = hand.map(function (v) {
         if (v.gone) return '<div class="pcard sm gone" id="aihand-gap"></div>';
-        return handHtml([v], 'ai', -1, true);
+        return handHtml([v], 'ai', true);
       }).join('');
     }
   }
@@ -729,7 +732,7 @@
         else {
           sound.draw();
           showBanner('魂主弃 1 摸 1（-2 分）');
-          renderHands(-1);
+          renderHands();
           const m2 = ai.playDrawnIfPossible(state, 'ai', r.newCard);
           if (m2) { t(function () { execPlay('ai', m2); }, 350); return; }
           renderAll();
@@ -762,7 +765,6 @@
       $('remedy-overlay').classList.remove('hidden');
       const can = engine.canDiscardOne(state, 'player');
       $('btn-discard').classList.toggle('disabled', !can);
-    } else {
     }
   }
 
@@ -851,8 +853,8 @@
 
     $('btn-rules').addEventListener('click', function () {
       if (isMobileOrTablet()) {
-        // 手机 / 平板：跳转 B站视频页观看
-        window.open(BILI_VIDEO_URL, '_blank');
+        // 手机 / 平板：跳转 B站视频页观看（noopener 防止目标页访问来源页）
+        window.open(BILI_VIDEO_URL, '_blank', 'noopener');
         return;
       }
       openRulesVideo();
@@ -877,7 +879,7 @@
       if (animating || !engine.canDiscardOne(state, 'player')) return;
       $('remedy-overlay').classList.add('hidden');
       discardMode = true;
-      renderHands(-1);
+      renderHands();
     });
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
@@ -906,9 +908,6 @@
     $('player-hand').addEventListener('click', function (e) {
       const el = e.target.closest('.pcard');
       if (el && el.dataset.id) onHandTap(el.dataset.id);
-    });
-    $('ai-hand').addEventListener('click', function (e) {
-      // 对方手牌不可操作
     });
     $('board-inner').addEventListener('click', function (e) {
       const slot = e.target.closest('.slot');
