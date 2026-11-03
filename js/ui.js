@@ -90,10 +90,10 @@
     if (document.documentElement) document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
     document.title = tr('doc_title');
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      el.textContent = t(el.getAttribute('data-i18n'));
+      el.textContent = tr(el.getAttribute('data-i18n'));
     });
     document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
-      el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+      el.setAttribute('title', tr(el.getAttribute('data-i18n-title')));
     });
     const btnLang = $('btn-lang');
     if (btnLang) btnLang.textContent = tr('switch_lang');
