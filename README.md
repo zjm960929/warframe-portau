@@ -1,40 +1,78 @@
-# Warframe Portau 波陶 · 网页版
+# Portau 波陶 · Warframe Card Game (Web)
 
-《Warframe》波陶（Portau）卡牌游戏的网页版。
+**中文** | [English](#english)
 
-纯静态页面，无需后端，可直接通过 GitHub Pages 部署游玩。
+《Warframe》波陶（Portau）卡牌游戏网页版。纯静态页面，无需后端、无需安装，打开即玩。
+
+**[▶ 立即游玩](https://zjm960929.github.io/warframe-portau/)**
 
 ## 玩法简介
 
-- 13 个牌槽（A~K），双方轮流落牌，按「不夹牌 2 分 / 不对称夹牌 4 分 / 对称夹牌 7 分」计分
-- 鬼牌（Joker）可放任意空槽；对应点数的普通牌可以抢夺它（计 0 分、不摸牌）
-- 无牌可出时：弃 1 摸 1（-2 分）或重新摸牌（结束回合）
-- 开局比大小决定先手；AI（魂主）分简单 / 普通 / 困难三档
+- 牌堆由 4 花色 A~K 共 52 张普通牌 + 4 张鬼牌组成
+- 桌上有 13 个牌槽（对应 A 至 K），双方各持 4 张手牌轮流落牌
+- **计分口诀**：所放的牌不在任何两张牌之间 **+2**；夹在两牌之间但两侧间隔不对称 **+4**；恰好夹在正中间（两侧对称）**+7**
+- **鬼牌（Joker）**：可放入任意空槽，按位置正常计分；当对应点数的普通牌打出时会被**抢夺**——普通牌盖住鬼牌、鬼牌回到原主人手中，抢夺计 0 分且不摸牌
+- **没有可出的牌时**：弃 1 摸 1（-2 分，新牌可立即打出）或整手重摸（立即结束回合）
+- **决定先手**：开局双方各抽一张同花色 A~K 比大小，点数大者先手
+- **魂主（AI）**：三档难度，困难难度会评估给玩家送分与自身连携
+- 13 个牌槽全部填满后结算，得分高者获胜
 
-## 本地游玩
+## 特性
 
-直接用浏览器打开 `index.html` 即可（推荐 Chrome / Edge，横屏或宽窗口体验最佳）。
+- Tau 科幻风格 UI，全屏自适应（桌面大屏分级放大 / 移动端横屏提示）
+- 完整动画：抽牌揭示、发牌、出牌飞行、摸牌补位、鬼牌抢夺飞回
+- 背景音乐与合成音效，可一键开关
+- 无后端、无追踪、无依赖框架
 
-## GitHub Pages 部署
+## 关注作者
 
-1. 仓库页面 → **Settings** → **Pages**
-2. Source 选择 **Deploy from a branch**，Branch 选择 **main** / **(root)**，保存
-3. 等待 1~2 分钟，访问 `https://<你的用户名>.github.io/warframe-portau/` 即可游玩
+- B站（哔哩哔哩）：[@ZJM](https://space.bilibili.com/16730771)
+- 抖音：[@ZJM](https://www.douyin.com/user/MS4wLjABAAAAFIQ6-Ww8fODvrsOR2oFTtegpwDnpVq_PKHIUbxkvFSE)
 
-> 已包含 `.nojekyll`，无需额外构建步骤。
+---
 
-## 目录结构
+<a id="english"></a>
+# Portau · Warframe Card Game (Web)
 
+**[中文](#portau-波陶--warframe-card-game-web)** | **English**
+
+A web version of *Portau*, the card game from Warframe's PMCF live stream. Fully static — no backend, no install, just open and play.
+
+**[▶ Play now](https://zjm960929.github.io/warframe-portau/)**
+
+## How to Play
+
+- The deck has 52 suited cards (A–K × 4 suits) plus 4 Jokers
+- There are 13 slots on the table (one per rank, A through K); both players hold 4 cards and take turns
+- **Scoring**: a card placed with no cards on both sides scores **+2**; placed between two cards with unequal gaps on each side scores **+4**; placed exactly in the middle of two cards (equal gaps) scores **+7**
+- **Joker**: may be placed on any empty slot and scores normally; when the matching rank is played, the Joker is **captured** — the rank card covers it and returns to the Joker's owner. Capturing scores 0 and skips the draw
+- **No legal moves?** Discard 1 and draw 1 (−2 points, the new card may be played immediately), or redraw your whole hand (ends your turn)
+- **First player**: each side draws one card from a single suit (A–K); the higher rank goes first
+- **The Soul Master (AI)**: three difficulty levels; on Hard it weighs feeding points to you against its own synergies
+- Once all 13 slots are filled, the higher total score wins
+
+## Features
+
+- Tau sci-fi styled UI, fully responsive (large-screen scaling on desktop / rotate hint on mobile)
+- Full animation set: draw reveal, dealing, card flight, draw-to-hand refill, joker capture fly-back
+- Background music and synthesized sound effects with a one-click toggle
+- No backend, no tracking, no frameworks
+
+## Follow the Author
+
+- Bilibili: [@ZJM](https://space.bilibili.com/16730771)
+- Douyin (TikTok): [@ZJM](https://www.douyin.com/user/MS4wLjABAAAAFIQ6-Ww8fODvrsOR2oFTtegpwDnpVq_PKHIUbxkvFSE)
+
+## Development
+
+```bash
+# 核心规则自测 / core logic tests
+node tools/test-core.js
+
+# 端到端 UI 冒烟测试 / end-to-end UI smoke test
+node tools/test-ui.js
 ```
-index.html        页面入口
-css/style.css     样式（Tau 科幻风）
-js/core.js        核心规则（UMD，浏览器/Node 通用）
-js/ui.js          对局控制器与动画
-images/bg.jpg     背景图
-audio/bgm.mp3     背景音乐
-tools/            Node 自测脚本（node tools/test-core.js / node tools/test-ui.js）
-```
 
-## 许可
+## License
 
-游戏玩法来自 Digital Extremes 的《Warframe》PMCF 活动演示，仅供学习交流。
+The game design comes from Digital Extremes' Warframe PMCF live stream. This project is for learning and personal entertainment only.
