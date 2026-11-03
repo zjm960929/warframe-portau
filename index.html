@@ -117,36 +117,15 @@
     </div>
   </div>
 
-  <!-- 规则弹窗（全页面共用） -->
+  <!-- 规则视频弹窗（B站嵌入） -->
   <div class="overlay hidden" id="rules-overlay">
-    <div class="modal wide">
+    <div class="modal wide video-modal">
       <div class="modal-title">规则说明</div>
-      <div class="rule-block">
-        <div class="rule-h">目标</div>
-        <div class="rule-p">与魂主轮流把牌放入 13 个牌槽（A、2 至 10、J、Q、K），全部填满后得分高者获胜。双方手牌全程互相可见。</div>
+      <div class="modal-sub">视频来自 B站 @ZJM</div>
+      <div class="video-wrap">
+        <iframe id="rules-video" src="about:blank" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
       </div>
-      <div class="rule-block">
-        <div class="rule-h">计分口诀</div>
-        <div class="rule-score-row"><span class="pts p2">2 分</span><span>所放的牌不在任何两张牌之间</span></div>
-        <div class="rule-score-row"><span class="pts p4">4 分</span><span>夹在两张牌之间，但两侧间隔不对称</span></div>
-        <div class="rule-score-row"><span class="pts p7">7 分</span><span>夹在两张牌正中间，两侧间隔对称</span></div>
-      </div>
-      <div class="rule-block">
-        <div class="rule-h">鬼牌（Joker）</div>
-        <div class="rule-li">· 可放入任意空槽，按位置正常计分</div>
-        <div class="rule-li">· 对应点数的普通牌可以盖住它，把鬼牌抢走</div>
-        <div class="rule-li">· 抢鬼牌计 0 分，且该回合不摸牌</div>
-      </div>
-      <div class="rule-block">
-        <div class="rule-h">没有可出的牌时</div>
-        <div class="rule-li">· 弃 1 摸 1：花 2 分弃 1 张再摸 1 张，新牌可立即打出（每回合限一次，分数不足 2 分时不可用）</div>
-        <div class="rule-li">· 重新摸牌：弃掉全部 4 张再摸 4 张，但立即结束回合</div>
-      </div>
-      <div class="rule-block">
-        <div class="rule-h">决定先手</div>
-        <div class="rule-p">开局你先抽 1 张牌，魂主再抽 1 张（同一花色的 A 至 K），点数大者先手。</div>
-      </div>
-      <button class="btn primary" id="btn-rules-close">我知道了</button>
+      <button class="btn primary" id="btn-rules-close">关闭</button>
     </div>
   </div>
 

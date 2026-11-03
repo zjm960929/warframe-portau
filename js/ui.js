@@ -779,8 +779,18 @@
       });
     });
     $('btn-start').addEventListener('click', function () { startBgm(); startGame(); });
-    $('btn-rules').addEventListener('click', function () { $('rules-overlay').classList.remove('hidden'); });
-    $('btn-rules-close').addEventListener('click', function () { $('rules-overlay').classList.add('hidden'); });
+  // ---------- 规则视频（B站嵌入） ----------
+  const RULES_VIDEO_SRC = 'https://player.bilibili.com/player.html?isOutside=true&aid=117553221341646&bvid=BV191436sE5f&cid=43300489990&p=1&autoplay=0';
+
+  $('btn-rules').addEventListener('click', function () {
+    // 打开时注入视频地址，关闭时置空以停止播放
+    $('rules-video').src = RULES_VIDEO_SRC;
+    $('rules-overlay').classList.remove('hidden');
+  });
+  $('btn-rules-close').addEventListener('click', function () {
+    $('rules-video').src = 'about:blank';
+    $('rules-overlay').classList.add('hidden');
+  });
     $('btn-bgm').addEventListener('click', function () { toggleBgm(); });
 
     // 对局
