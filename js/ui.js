@@ -645,7 +645,8 @@
       const capGap = document.getElementById(who === 'player' ? 'hand-gap' : 'aihand-gap');
       const slotEl = document.getElementById('board-inner').children[slotIdx] ?
         document.getElementById('board-inner').children[slotIdx].querySelector('.slot') : null;
-      const from = rect(slotEl);
+      // 起点用槽内真实卡牌矩形（92%×94% 居中），与桌上实体卡完全重合
+      const from = slotEl ? slotCardRect(rect(slotEl)) : null;
       const to = rect(capGap);
       if (!from || !to) {
         engine.insertCard(state, who, r.handIndex, r.capturedCard);
