@@ -195,11 +195,15 @@ body {
   font-weight: 700;
   letter-spacing: 4px;
   line-height: 1.15;
-  background: linear-gradient(90deg, #35e0ff, #8b7bff, #ffd166);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: none;
+  color: #ffffff;
+  -webkit-text-stroke: 2px #7a0e1e;
+  animation: titleGlow 1.6s ease-in-out infinite alternate;
+}
+
+/* 呼吸式红光（呼应鬼牌抢夺的 slotPulseCap） */
+@keyframes titleGlow {
+  from { text-shadow: 0 0 6px rgba(255, 93, 108, .25), 0 0 14px rgba(255, 93, 108, .15); }
+  to { text-shadow: 0 0 12px rgba(255, 93, 108, .75), 0 0 28px rgba(255, 93, 108, .45); }
 }
 
 .deco-line {
@@ -667,7 +671,7 @@ body {
 
 /* ---------- 桌面大屏：UI 分级放大，铺满全屏 ---------- */
 @media (min-width: 1100px) and (orientation: landscape) {
-  .title { font-size: 64px; }
+  .title { font-size: 64px; -webkit-text-stroke: 3px #7a0e1e; }
   .deco-line { width: 300px; }
   .panel { max-width: 560px; padding: 24px 28px; }
   .diff-name { font-size: 18px; }
@@ -711,7 +715,7 @@ body {
 }
 
 @media (min-width: 2000px) and (orientation: landscape) {
-  .title { font-size: 88px; }
+  .title { font-size: 88px; -webkit-text-stroke: 4px #7a0e1e; }
   .panel { max-width: 700px; }
   .btn { width: 320px; font-size: 18px; }
   .nav-back { width: 56px; height: 56px; font-size: 32px; }
