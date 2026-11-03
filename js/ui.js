@@ -9,6 +9,7 @@
   const I18N = {
     zh: {
       doc_title: 'PORτAU 波陶',
+      title_zh: ' 波陶',
       choose_difficulty: '选择难度',
       diff_easy: '简单', diff_normal: '普通', diff_hard: '困难',
       start: '开始对局', howto: '规则说明',
@@ -45,6 +46,7 @@
     },
     en: {
       doc_title: 'PORτAU',
+      title_zh: '',
       choose_difficulty: 'Choose Difficulty',
       diff_easy: 'Easy', diff_normal: 'Normal', diff_hard: 'Hard',
       start: 'Start Game', howto: 'How to Play',
