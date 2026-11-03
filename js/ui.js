@@ -414,10 +414,20 @@
   function beginPlay(first) {
     engine.setFirstPlayer(state, first);
     $('opening-overlay').classList.add('hidden');
-    renderBoard(); // 空桌面（13 个槽位与文字标签可见）
+    renderBoard(); // 牌槽此时处于隐藏状态（布局占位保留）
     renderDealingHands({ player: 0, ai: 0 });
+    $('turn-text').textContent = '';
     animating = true;
-    // 顺序：初始牌上桌 → 双方发牌
+    // ① 先为双方发牌；② 发完显示牌槽；③ 过渡结束后初始牌上桌；④ 进入对局
+    dealSequence(first, function () {
+      renderAll();
+      setBoardVisible(true);
+      t(function () { afterBoardReveal(first); }, 520); // 等待棋盘淡入过渡结束
+    });
+  }
+
+  // ③ 棋盘显示完成后：初始牌从牌堆飞上牌桌
+  function afterBoardReveal(first) {
     const init = engine.drawInitialCard(state);
     $('deck-num').textContent = state.deck.length;
     const slotEl = document.getElementById('board-inner').children[init.rank - 1] ?
@@ -426,20 +436,23 @@
     const to = rect(slotEl);
     if (!from || !to) {
       renderBoard();
-      afterInitialCard(first);
+      enterPlay(first);
       return;
     }
     const startRect = { left: from.left, top: from.top, width: Math.min(44, from.width), height: Math.min(58, from.height) };
     spawnFly(toView(init), false, startRect, slotCardRect(to), 'deal', function () {
       renderBoard(); // 初始牌落桌（盖住文字标签）
-      afterInitialCard(first);
+      // ④ 正式进入对局
+      enterPlay(first);
     });
   }
 
-  function afterInitialCard(first) {
-    renderDealingHands({ player: 0, ai: 0 });
-    $('deck-num').textContent = state.deck.length;
-    dealSequence(first);
+  // ④ 解锁输入、显示回合提示、启动回合流程
+  function enterPlay(first) {
+    animating = false; // 先解锁再渲染
+    setTurnText();
+    if (state.turn === 'ai') aiTurn();
+    else checkPlayerMoves();
   }
 
   // 发牌期间的渲染：每方 4 个占位，前 n 张已发亮出牌面
@@ -463,7 +476,7 @@
     $('ai-hand').innerHTML = row('ai');
   }
 
-  function dealSequence(first) {
+  function dealSequence(first, onDone) {
     const order = [];
     const other = first === 'player' ? 'ai' : 'player';
     for (let i = 0; i < 4; i++) { order.push(first, other); } // 先手先拿牌，交替发
@@ -471,12 +484,9 @@
     let i = 0;
     function step() {
       if (i >= order.length) {
-        animating = false; // 先解锁再渲染，避免手牌按「无法操作」变暗
+        // 发牌完毕：保持动画锁（期间玩家不可操作），由回调继续后续流程
         renderAll();
-        setTurnText();
-        setBoardVisible(true); // 发牌完毕：牌槽淡入升起
-        if (state.turn === 'ai') aiTurn();
-        else checkPlayerMoves();
+        if (onDone) onDone();
         return;
       }
       const who = order[i];
