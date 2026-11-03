@@ -80,7 +80,7 @@
       switch_lang: '切换到中文'
     }
   };
-  function t(key, vars) {
+  function tr(key, vars) {
     let s = (I18N[lang] && I18N[lang][key]) || I18N.zh[key] || key;
     if (vars) { for (const k in vars) s = s.split('{' + k + '}').join(vars[k]); }
     return s;
@@ -88,7 +88,7 @@
   // 应用到所有带 data-i18n / data-i18n-title 的静态元素；切换按钮显示另一种语言
   function applyI18n() {
     if (document.documentElement) document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
-    document.title = t('doc_title');
+    document.title = tr('doc_title');
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       el.textContent = t(el.getAttribute('data-i18n'));
     });
@@ -96,7 +96,7 @@
       el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
     });
     const btnLang = $('btn-lang');
-    if (btnLang) btnLang.textContent = t('switch_lang');
+    if (btnLang) btnLang.textContent = tr('switch_lang');
     syncBgmButtons();
   }
 
@@ -202,7 +202,7 @@
   // 同步两个音乐开关的显示状态（菜单文字按钮 + 对局内图标按钮）
   function syncBgmButtons() {
     const btnBgm = $('btn-bgm');
-    if (btnBgm) btnBgm.textContent = bgmOn ? t('music_on') : t('music_off');
+    if (btnBgm) btnBgm.textContent = bgmOn ? tr('music_on') : tr('music_off');
     const btnIcon = $('btn-bgm-ingame');
     if (btnIcon) btnIcon.classList.toggle('muted', !bgmOn);
   }
@@ -299,7 +299,7 @@
 
   function setTurnText() {
     const el = $('turn-text');
-    el.textContent = state.turn === 'player' ? t('tenno_turn') : t('hunra_thinking');
+    el.textContent = state.turn === 'player' ? tr('tenno_turn') : tr('hunra_thinking');
     el.className = state.turn === 'player' ? 'turn-me' : 'turn-ai';
     // 回合切换时重渲染我方手牌的明暗状态（静态 HTML 需手动刷新）
     renderHands();
@@ -394,7 +394,7 @@
     canEndTurn = false;
     // 建局但不发牌：先决定先手，再播发牌动画
     state = engine.createState(difficulty);
-    $('ai-name').textContent = t('ai_name', { d: t('diff_' + difficulty) });
+    $('ai-name').textContent = tr('ai_name', { d: tr('diff_' + difficulty) });
     $('actionbar').classList.add('hidden');
     $('remedy-overlay').classList.add('hidden');
     $('result-overlay').classList.add('hidden');
@@ -468,7 +468,7 @@
 
   function revealPlayer(playerCard) {
     $('frame-player').innerHTML = cardHtml(toView(playerCard));
-    $('draw-msg').textContent = t('hunra_drawing');
+    $('draw-msg').textContent = tr('hunra_drawing');
     $('draw-msg').className = 'draw-msg drawing';
     t(function () { aiDrawSequence(playerCard); }, 800);
   }
@@ -496,7 +496,7 @@
   function revealAi(aiCard, playerCard) {
     $('frame-ai').innerHTML = cardHtml(toView(aiCard));
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? t('tenno_first') : t('hunra_first');
+    $('draw-msg').textContent = first === 'player' ? tr('tenno_first') : tr('hunra_first');
     $('draw-msg').className = 'draw-msg';
     t(function () { beginPlay(first); }, 1400);
   }
@@ -504,7 +504,7 @@
   function finishOpening(aiCard, playerCard) {
     if (!aiCard || !playerCard) { beginPlay('player'); return; }
     const first = playerCard.rank > aiCard.rank ? 'player' : 'ai';
-    $('draw-msg').textContent = first === 'player' ? t('tenno_first') : t('hunra_first');
+    $('draw-msg').textContent = first === 'player' ? tr('tenno_first') : tr('hunra_first');
     t(function () { beginPlay(first); }, 1400);
   }
 
@@ -645,7 +645,7 @@
       capFlags[card.rank - 1] = true;
     }
     if (!flags.some(function (f) { return f; })) {
-      toast(t('toast_no_slot'));
+      toast(tr('toast_no_slot'));
       return;
     }
     selectedId = id;
@@ -659,7 +659,7 @@
     if (screen !== 'game' || state.phase !== 'playing') return;
     if (state.turn !== 'player' || animating) return;
     if (!selectedId || !legalFlags[idx]) {
-      if (selectedId) toast(t('toast_highlight'));
+      if (selectedId) toast(tr('toast_highlight'));
       return;
     }
     const card = state.hands.player.find(function (c) { return c.id === selectedId; });
@@ -688,7 +688,7 @@
     const r = engine.playMove(state, who, move, true);
     if (r.error) {
       animating = false;
-      toast(t('toast_invalid'));
+      toast(tr('toast_invalid'));
       return;
     }
     selectedId = null;
@@ -745,8 +745,8 @@
     renderSlotsOnly();
     if (r.captured) {
       sound.capture();
-      showGain(slotIdx, t('gain_capture'), 'cap');
-      showBanner(t('banner_capture', { w: who === 'player' ? t('tenno') : t('hunra') }));
+      showGain(slotIdx, tr('gain_capture'), 'cap');
+      showBanner(tr('banner_capture', { w: who === 'player' ? tr('tenno') : tr('hunra') }));
     } else {
       sound.play();
       if (r.gain > 0) {
@@ -823,7 +823,7 @@
     }
     if (r.capturedCard) engine.insertCard(state, who, r.handIndex, r.capturedCard);
     renderAll();
-    if (r.captured) { sound.capture(); showGain(slotIdx, t('gain_capture'), 'cap'); }
+    if (r.captured) { sound.capture(); showGain(slotIdx, tr('gain_capture'), 'cap'); }
     else { sound.play(); if (r.gain > 0) { sound.score(); showGain(slotIdx, '+' + r.gain, r.gain >= 7 ? 'best' : 'normal'); } }
     if (state.phase === 'over') { finish(); return; }
     animating = false;
@@ -846,7 +846,7 @@
         if (r.error) { engine.skipTurn(state); }
         else {
           sound.draw();
-          showBanner(t('banner_ai_discard'));
+          showBanner(tr('banner_ai_discard'));
           renderHands();
           const m2 = ai.playDrawnIfPossible(state, 'ai', r.newCard);
           if (m2) { t(function () { execPlay('ai', m2); }, 350); return; }
@@ -858,7 +858,7 @@
         if (r.error) { engine.skipTurn(state); }
         else {
           sound.draw();
-          showBanner(t('banner_ai_redraw'));
+          showBanner(tr('banner_ai_redraw'));
           renderAll();
           engine.endTurn(state);
         }
@@ -885,7 +885,7 @@
 
   function doDiscard(id) {
     const r = engine.discardOne(state, 'player', id);
-    if (r.error) { toast(t('toast_no_discard')); return; }
+    if (r.error) { toast(tr('toast_no_discard')); return; }
     sound.draw();
     discardMode = false;
     renderAll();
@@ -893,9 +893,9 @@
     if (playable) {
       canEndTurn = true;
       $('actionbar').classList.remove('hidden');
-      showBanner(t('banner_new_playable'));
+      showBanner(tr('banner_new_playable'));
     } else {
-      showBanner(t('banner_new_unplayable'));
+      showBanner(tr('banner_new_unplayable'));
       engine.endTurn(state);
       setTurnText();
       aiTurn();
@@ -906,9 +906,9 @@
   function finish() {
     animating = false;
     const outcome = state.result.outcome;
-    $('result-title').textContent = outcome === 'player_win' ? t('victory') : (outcome === 'ai_win' ? t('defeat') : t('draw_game'));
+    $('result-title').textContent = outcome === 'player_win' ? tr('victory') : (outcome === 'ai_win' ? tr('defeat') : tr('draw_game'));
     $('result-title').className = 'result-title ' + outcome;
-    $('result-score').textContent = t('score_line', { t: t('tenno'), p: state.result.player, a: state.result.ai, h: t('hunra') });
+    $('result-score').textContent = tr('score_line', { t: tr('tenno'), p: state.result.player, a: state.result.ai, h: tr('hunra') });
     $('result-overlay').classList.remove('hidden');
     if (outcome === 'player_win') sound.win();
     else if (outcome === 'ai_win') sound.lose();
@@ -1004,11 +1004,11 @@
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
       const r = engine.fullRedraw(state, 'player');
-      if (r.error) { toast(t('toast_deck_low')); return; }
+      if (r.error) { toast(tr('toast_deck_low')); return; }
       sound.draw();
       $('remedy-overlay').classList.add('hidden');
       renderAll();
-      showBanner(t('banner_redraw_end'));
+      showBanner(tr('banner_redraw_end'));
       engine.endTurn(state);
       setTurnText();
       aiTurn();
