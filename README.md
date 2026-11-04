@@ -19,9 +19,11 @@
 
 ## 特性
 
+- **界面中英双语**：主界面一键切换 中文 / English，偏好自动记忆
+- **规则视频**：规则说明按钮内嵌 B站视频教程（移动端点击直接跳转观看）
 - Tau 科幻风格 UI，全屏自适应（桌面大屏分级放大 / 移动端横屏提示）
-- 完整动画：抽牌揭示、发牌、出牌飞行、摸牌补位、鬼牌抢夺飞回
-- 背景音乐与合成音效，可一键开关
+- 完整动画：开局抽牌揭示、先手判定、发牌、出牌飞行、摸牌补位、鬼牌抢夺飞回、补救动画
+- 背景音乐与合成音效，可一键开关（主菜单与对局内均可控制）
 - 无后端、无追踪、无依赖框架
 
 ## 关注作者
@@ -53,9 +55,11 @@ A web version of *Portau*, the card game from Warframe's PMCF live stream. Fully
 
 ## Features
 
+- **Bilingual UI** — Chinese / English with a one-click toggle on the main menu (preference saved)
+- **Video tutorial** — the rules button plays an embedded Bilibili tutorial (opens on Bilibili on mobile)
 - Tau sci-fi styled UI, fully responsive (large-screen scaling on desktop / rotate hint on mobile)
-- Full animation set: draw reveal, dealing, card flight, draw-to-hand refill, joker capture fly-back
-- Background music and synthesized sound effects with a one-click toggle
+- Full animation set: opening draw reveal, first-player showdown, dealing, card flight, draw-to-hand refill, joker capture fly-back, remedy animations
+- Background music and synthesized sound effects, toggleable from both the menu and the game screen
 - No backend, no tracking, no frameworks
 
 ## Follow the Author
