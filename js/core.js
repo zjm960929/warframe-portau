@@ -208,7 +208,7 @@
     const nc = state.deck.pop();
     hand.push(nc);
     state.discardedThisTurn = true;
-    return { newCard: nc };
+    return { newCard: nc, handIndex: idx };
   }
 
   function canFullRedraw(state) { return state.deck.length > 0; }

@@ -919,13 +919,14 @@
     const cardEl = document.getElementById('hand-' + id);
     const cardView = toView(state.hands.player.find(function (c) { return c.id === id; }));
     const fromRect = rect(cardEl);
+    // 先定位弃牌索引（discardOne 会把它移出手牌）
+    const discardIdx = state.hands.player.findIndex(function (c) { return c.id === id; });
     const r = engine.discardOne(state, 'player', id);
     if (r.error) { toast(tr('toast_no_discard')); return; }
     sound.draw();
     discardMode = false;
     setAnimating(true);
     const newCard = r.newCard;
-    const discardIdx = r.handIndex;
     state.hands.player.pop(); // 暂取回新牌（动画结束后放入弃牌空位）
     // ① 克隆卡先同步盖住弃牌原位，再向下渐隐
     if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0);
