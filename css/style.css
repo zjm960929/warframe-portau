@@ -524,7 +524,9 @@ body.anim .nav-bgm {
 }
 
 /* ---------- 操作 ---------- */
-.actionbar { display: flex; justify-content: center; padding: 2px 0; flex-shrink: 0; }
+.actionbar { display: flex; align-items: center; justify-content: center; height: 40px; padding: 0; flex-shrink: 0; }
+/* 固定占位：出现/隐藏不推动牌槽区 */
+.actionbar.hidden { display: flex !important; visibility: hidden; }
 .actionbar .mini { width: 160px; font-size: 13px; line-height: 2; margin: 0 auto; }
 
 /* ---------- 遮罩与弹窗 ---------- */
@@ -680,6 +682,10 @@ body.anim .nav-bgm {
 .fly-card.slow { transition: transform .46s ease-in-out; }
 .fly-card.draw { transition: transform .36s ease-out; }
 .fly-card.deal { transition: transform .28s ease-out; }
+
+/* 补救动画：弃牌下移渐隐 */
+.fly-card.fade-down { transition: transform .38s ease-in, opacity .38s ease-in; }
+.fly-card.fade-down.out { transform: translateY(90px); opacity: 0; }
 
 .banner {
   position: fixed;

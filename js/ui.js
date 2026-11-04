@@ -898,23 +898,105 @@
     }
   }
 
+  // 补救动画：弃牌向下移动并渐隐
+  function fadeCardDown(view, fromRect, delay) {
+    t(function () {
+      const layer = $('fly-layer');
+      const div = document.createElement('div');
+      let cls = 'pcard fly-card fade-down' + (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
+      div.className = cls;
+      div.innerHTML = faceInner(view);
+      div.style.left = fromRect.left + 'px';
+      div.style.top = fromRect.top + 'px';
+      div.style.width = fromRect.width + 'px';
+      div.style.height = fromRect.height + 'px';
+      layer.appendChild(div);
+      t(function () { div.classList.add('out'); }, 30);
+      t(function () { if (div.parentNode) div.parentNode.removeChild(div); }, 450);
+    }, delay || 0);
+  }
+
   function doDiscard(id) {
+    if (animating) return;
+    const cardEl = document.getElementById('hand-' + id);
+    const cardView = toView(state.hands.player.find(function (c) { return c.id === id; }));
+    const fromRect = rect(cardEl);
     const r = engine.discardOne(state, 'player', id);
     if (r.error) { toast(tr('toast_no_discard')); return; }
     sound.draw();
     discardMode = false;
-    renderAll();
-    const playable = rules.legalMoves(state.hands.player, state.slots).some(function (m) { return m.card.id === r.newCard.id; });
-    if (playable) {
-      canEndTurn = true;
-      $('actionbar').classList.remove('hidden');
-      showBanner(tr('banner_new_playable'));
-    } else {
-      showBanner(tr('banner_new_unplayable'));
-      engine.endTurn(state);
-      setTurnText();
-      aiTurn();
+    setAnimating(true);
+    const newCard = r.newCard;
+    state.hands.player.pop(); // 暂取回新牌：先渲染 3 张旧牌 + 末位空位
+    renderHandsWithGap('player', state.hands.player.length);
+    // ① 弃牌下移渐隐
+    if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0);
+    // ② 之后播放抽牌动画：牌堆 → 末位空位
+    t(function () {
+      const deckR = rect($('deck-box'));
+      const gapEl = document.getElementById('hand-gap');
+      const toR = rect(gapEl);
+      function done() {
+        state.hands.player.push(newCard);
+        const playable = rules.legalMoves(state.hands.player, state.slots).some(function (m) { return m.card.id === newCard.id; });
+        setAnimating(false);
+        if (playable) {
+          canEndTurn = true;
+          $('actionbar').classList.remove('hidden');
+          renderHands();
+          showBanner(tr('banner_new_playable'));
+        } else {
+          showBanner(tr('banner_new_unplayable'));
+          engine.endTurn(state);
+          setTurnText();
+          aiTurn();
+        }
+      }
+      if (!deckR || !toR) { done(); return; }
+      const startR = { left: deckR.left, top: deckR.top, width: Math.min(44, deckR.width), height: Math.min(58, deckR.height) };
+      spawnFly(null, true, startR, toR, 'draw', function () {
+        state.hands.player.push(newCard);
+        if (gapEl) {
+          gapEl.innerHTML = faceInner(toView(newCard));
+          gapEl.classList.remove('gone');
+          gapEl.classList.add(newCard.red ? 'red' : 'black');
+        }
+        done();
+      }, gapEl);
+    }, 460);
+  }
+
+  // 重新摸牌：逐张把新牌从牌堆飞入占位
+  function dealRedrawnHand() {
+    const hand = state.hands.player;
+    let i = 0;
+    function step() {
+      if (i >= hand.length) { afterRedrawDone(); return; }
+      const deckR = rect($('deck-box'));
+      const phEl = document.getElementById('rhand-' + i);
+      const toR = rect(phEl);
+      if (!deckR || !toR) { i += 1; step(); return; }
+      const startR = { left: deckR.left, top: deckR.top, width: Math.min(44, deckR.width), height: Math.min(58, deckR.height) };
+      sound.draw();
+      spawnFly(toView(hand[i]), false, startR, toR, 'draw', function () {
+        if (phEl) {
+          phEl.innerHTML = faceInner(toView(hand[i]));
+          phEl.classList.remove('gone');
+          phEl.classList.add(hand[i].red ? 'red' : 'black');
+        }
+        i += 1;
+        step();
+      }, phEl);
     }
+    step();
+  }
+
+  function afterRedrawDone() {
+    showBanner(tr('banner_redraw_end'));
+    engine.endTurn(state);
+    setAnimating(false);
+    setTurnText();
+    aiTurn();
   }
 
   // ---------- 结算 ----------
@@ -1018,15 +1100,23 @@
     });
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
+      // 先记录旧牌矩形与视图（fullRedraw 会清空手牌）
+      const oldViews = state.hands.player.map(toView);
+      const oldRects = state.hands.player.map(function (c) { return rect(document.getElementById('hand-' + c.id)); });
       const r = engine.fullRedraw(state, 'player');
       if (r.error) { toast(tr('toast_deck_low')); return; }
       sound.draw();
       $('remedy-overlay').classList.add('hidden');
-      renderAll();
-      showBanner(tr('banner_redraw_end'));
-      engine.endTurn(state);
-      setTurnText();
-      aiTurn();
+      setAnimating(true);
+      $('deck-num').textContent = state.deck.length;
+      // 渲染 4 个空占位
+      let ph = '';
+      for (let i = 0; i < 4; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
+      $('player-hand').innerHTML = ph;
+      // 旧牌错峰下移渐隐
+      oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70); });
+      // 渐隐完成后逐张发新牌
+      t(function () { dealRedrawnHand(); }, 420 + 3 * 70);
     });
     $('btn-skip').addEventListener('click', function () {
       if (animating) return;
