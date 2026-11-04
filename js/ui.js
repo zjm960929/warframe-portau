@@ -899,12 +899,16 @@
   }
 
   // 补救动画：弃牌克隆卡先同步盖住原位（避免先消失后出现的闪烁），随后向下移动并渐隐
-  function fadeCardDown(view, fromRect, outDelay) {
+  // srcEl：源卡牌元素——克隆卡继承其字号，牌面花色数字大小与实体卡一致
+  function fadeCardDown(view, fromRect, outDelay, srcEl) {
     const layer = $('fly-layer');
     const div = document.createElement('div');
     let cls = 'pcard fly-card fade-down' + (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
     div.className = cls;
     div.innerHTML = faceInner(view);
+    if (srcEl && window.getComputedStyle) {
+      try { div.style.fontSize = getComputedStyle(srcEl).fontSize; } catch (e) { /* 保持基础字号 */ }
+    }
     div.style.left = fromRect.left + 'px';
     div.style.top = fromRect.top + 'px';
     div.style.width = fromRect.width + 'px';
@@ -929,7 +933,7 @@
     const newCard = r.newCard;
     state.hands.player.pop(); // 暂取回新牌（动画结束后放入弃牌空位）
     // ① 克隆卡先同步盖住弃牌原位，再向下渐隐
-    if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0);
+    if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0, cardEl);
     // ② 空出弃牌位：其它手牌保持原位不动
     renderHandsWithGap('player', discardIdx);
     // ③ 之后播放抽牌动画：牌堆 → 弃牌空位
@@ -1097,8 +1101,9 @@
     });
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
-      // 先记录旧牌矩形与视图（fullRedraw 会清空手牌）
+      // 先记录旧牌矩形、元素与视图（fullRedraw 会清空手牌）
       const oldViews = state.hands.player.map(toView);
+      const oldEls = state.hands.player.map(function (c) { return document.getElementById('hand-' + c.id); });
       const oldRects = state.hands.player.map(function (c) { return rect(document.getElementById('hand-' + c.id)); });
       const r = engine.fullRedraw(state, 'player');
       if (r.error) { toast(tr('toast_deck_low')); return; }
@@ -1107,7 +1112,7 @@
       setAnimating(true);
       $('deck-num').textContent = state.deck.length;
       // 克隆卡先同步盖住 4 张旧牌，再错峰下移渐隐（避免先消失后出现的闪烁）
-      oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70); });
+      oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70, oldEls[i]); });
       // 渲染 4 个空占位
       let ph = '';
       for (let i = 0; i < 4; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
