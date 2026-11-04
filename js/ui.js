@@ -898,22 +898,20 @@
     }
   }
 
-  // 补救动画：弃牌向下移动并渐隐
-  function fadeCardDown(view, fromRect, delay) {
-    t(function () {
-      const layer = $('fly-layer');
-      const div = document.createElement('div');
-      let cls = 'pcard fly-card fade-down' + (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
-      div.className = cls;
-      div.innerHTML = faceInner(view);
-      div.style.left = fromRect.left + 'px';
-      div.style.top = fromRect.top + 'px';
-      div.style.width = fromRect.width + 'px';
-      div.style.height = fromRect.height + 'px';
-      layer.appendChild(div);
-      t(function () { div.classList.add('out'); }, 30);
-      t(function () { if (div.parentNode) div.parentNode.removeChild(div); }, 450);
-    }, delay || 0);
+  // 补救动画：弃牌克隆卡先同步盖住原位（避免先消失后出现的闪烁），随后向下移动并渐隐
+  function fadeCardDown(view, fromRect, outDelay) {
+    const layer = $('fly-layer');
+    const div = document.createElement('div');
+    let cls = 'pcard fly-card fade-down' + (view.red ? ' red' : ' black') + (view.kind === 'joker' ? ' joker' : '');
+    div.className = cls;
+    div.innerHTML = faceInner(view);
+    div.style.left = fromRect.left + 'px';
+    div.style.top = fromRect.top + 'px';
+    div.style.width = fromRect.width + 'px';
+    div.style.height = fromRect.height + 'px';
+    layer.appendChild(div);
+    t(function () { div.classList.add('out'); }, 30 + (outDelay || 0));
+    t(function () { if (div.parentNode) div.parentNode.removeChild(div); }, 450 + (outDelay || 0));
   }
 
   function doDiscard(id) {
@@ -927,18 +925,24 @@
     discardMode = false;
     setAnimating(true);
     const newCard = r.newCard;
-    state.hands.player.pop(); // 暂取回新牌：先渲染 3 张旧牌 + 末位空位
-    renderHandsWithGap('player', state.hands.player.length);
-    // ① 弃牌下移渐隐
+    const discardIdx = r.handIndex;
+    state.hands.player.pop(); // 暂取回新牌（动画结束后放入弃牌空位）
+    // ① 克隆卡先同步盖住弃牌原位，再向下渐隐
     if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0);
-    // ② 之后播放抽牌动画：牌堆 → 末位空位
+    // ② 空出弃牌位：其它手牌保持原位不动
+    renderHandsWithGap('player', discardIdx);
+    // ③ 之后播放抽牌动画：牌堆 → 弃牌空位
     t(function () {
       const deckR = rect($('deck-box'));
       const gapEl = document.getElementById('hand-gap');
       const toR = rect(gapEl);
       function done() {
-        state.hands.player.push(newCard);
-        const playable = rules.legalMoves(state.hands.player, state.slots).some(function (m) { return m.card.id === newCard.id; });
+        // 新牌放入弃牌空位：状态顺序与视觉一致，避免后续渲染时跳位
+        const h = state.hands.player;
+        h.push(newCard);
+        h.splice(h.indexOf(newCard), 1);
+        h.splice(discardIdx, 0, newCard);
+        const playable = rules.legalMoves(h, state.slots).some(function (m) { return m.card.id === newCard.id; });
         setAnimating(false);
         if (playable) {
           canEndTurn = true;
@@ -954,15 +958,7 @@
       }
       if (!deckR || !toR) { done(); return; }
       const startR = { left: deckR.left, top: deckR.top, width: Math.min(44, deckR.width), height: Math.min(58, deckR.height) };
-      spawnFly(null, true, startR, toR, 'draw', function () {
-        state.hands.player.push(newCard);
-        if (gapEl) {
-          gapEl.innerHTML = faceInner(toView(newCard));
-          gapEl.classList.remove('gone');
-          gapEl.classList.add(newCard.red ? 'red' : 'black');
-        }
-        done();
-      }, gapEl);
+      spawnFly(null, true, startR, toR, 'draw', done, gapEl);
     }, 460);
   }
 
@@ -1109,14 +1105,14 @@
       $('remedy-overlay').classList.add('hidden');
       setAnimating(true);
       $('deck-num').textContent = state.deck.length;
+      // 克隆卡先同步盖住 4 张旧牌，再错峰下移渐隐（避免先消失后出现的闪烁）
+      oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70); });
       // 渲染 4 个空占位
       let ph = '';
       for (let i = 0; i < 4; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
       $('player-hand').innerHTML = ph;
-      // 旧牌错峰下移渐隐
-      oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70); });
       // 渐隐完成后逐张发新牌
-      t(function () { dealRedrawnHand(); }, 420 + 3 * 70);
+      t(function () { dealRedrawnHand(); }, 450 + 3 * 70);
     });
     $('btn-skip').addEventListener('click', function () {
       if (animating) return;
