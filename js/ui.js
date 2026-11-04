@@ -392,6 +392,12 @@
     return { left: slotRect.left + (slotRect.width - w) / 2, top: slotRect.top + (slotRect.height - h) / 2, width: w, height: h };
   }
 
+  // 牌堆起飞矩形：缩小尺寸，但以牌堆中心为锚（否则起点会偏向牌堆左侧）
+  function deckStartRect(from) {
+    const w = Math.min(44, from.width), h = Math.min(58, from.height);
+    return { left: from.left + (from.width - w) / 2, top: from.top + (from.height - h) / 2, width: w, height: h };
+  }
+
   // 槽位棋盘显隐：开局与发牌期间隐藏，发牌完毕淡入升起
   function setBoardVisible(show) {
     const b = $('board');
@@ -551,7 +557,7 @@
       enterPlay(first);
       return;
     }
-    const startRect = { left: from.left, top: from.top, width: Math.min(44, from.width), height: Math.min(58, from.height) };
+    const startRect = deckStartRect(from);
     spawnFly(toView(init), false, startRect, slotCardRect(to), 'deal', function () {
       renderBoard(); // 初始牌落桌（盖住文字标签）
       // ④ 正式进入对局
@@ -617,7 +623,7 @@
         step();
         return;
       }
-      const startRect = { left: from.left, top: from.top, width: Math.min(44, from.width), height: Math.min(58, from.height) };
+      const startRect = deckStartRect(from);
       spawnFly(toView(card), false, startRect, to, 'deal', function () {
         revealed[who] += 1;
         renderDealingHands(revealed);
@@ -814,7 +820,7 @@
       continueAfterDraw(who);
       return;
     }
-    const startRect = { left: from.left, top: from.top, width: Math.min(44, from.width), height: Math.min(58, from.height) };
+    const startRect = deckStartRect(from);
     spawnFly(null, true, startRect, to, 'draw', function () {
       engine.insertCard(state, who, r.handIndex, newCard);
       renderAll();
@@ -962,7 +968,7 @@
         }
       }
       if (!deckR || !toR) { done(); return; }
-      const startR = { left: deckR.left, top: deckR.top, width: Math.min(44, deckR.width), height: Math.min(58, deckR.height) };
+      const startR = deckStartRect(deckR);
       spawnFly(null, true, startR, toR, 'draw', done, gapEl);
     }, 460);
   }
@@ -977,7 +983,7 @@
       const phEl = document.getElementById('rhand-' + i);
       const toR = rect(phEl);
       if (!deckR || !toR) { i += 1; step(); return; }
-      const startR = { left: deckR.left, top: deckR.top, width: Math.min(44, deckR.width), height: Math.min(58, deckR.height) };
+      const startR = deckStartRect(deckR);
       sound.draw();
       spawnFly(toView(hand[i]), false, startR, toR, 'draw', function () {
         if (phEl) {
