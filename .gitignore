@@ -1,0 +1,15 @@
+# OS / editor droppings
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# Logs
+*.log
+
+# Dependencies (the site itself ships without any, kept for future tooling)
+node_modules/
+
+# Local editor / tooling settings
+.vscode/
+.idea/
