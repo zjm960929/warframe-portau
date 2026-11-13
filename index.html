@@ -24,7 +24,7 @@
   <div class="bg-scrim"></div>
   <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="none"></audio>
 
-  <!-- ========== 主菜单 ========== -->
+  <!-- ========== Main menu ========== -->
   <div class="screen" id="screen-menu">
     <div class="hero">
       <div class="title">POR<span class="title-tau">τ</span>AU<span data-i18n="title_zh"> 波陶</span></div>
@@ -63,7 +63,7 @@
     </div>
   </div>
 
-  <!-- ========== 对局 ========== -->
+  <!-- ========== Game ========== -->
   <div class="screen hidden" id="screen-game">
     <div class="topbar">
       <button class="nav-back" id="btn-back" title="返回主界面" data-i18n-title="back_title">‹</button>
@@ -98,7 +98,7 @@
       <button class="btn ghost mini" id="btn-endturn" data-i18n="endturn">结束回合</button>
     </div>
 
-    <!-- 开局抽牌 -->
+    <!-- Opening draw -->
     <div class="overlay" id="opening-overlay">
       <div class="draw-stage" id="draw-stage">
         <div class="overlay-title" data-i18n="decide_first">决定先手</div>
@@ -115,7 +115,7 @@
       </div>
     </div>
 
-    <!-- 补救弹窗 -->
+    <!-- Remedy modal -->
     <div class="overlay hidden" id="remedy-overlay">
       <div class="modal">
         <div class="modal-title" data-i18n="no_moves">没有可出的牌</div>
@@ -126,7 +126,7 @@
       </div>
     </div>
 
-    <!-- 结算 -->
+    <!-- Result -->
     <div class="overlay hidden" id="result-overlay">
       <div class="modal">
         <div class="result-title" id="result-title">胜利</div>
@@ -137,7 +137,7 @@
     </div>
   </div>
 
-  <!-- 规则视频弹窗（B站嵌入） -->
+  <!-- Rules video modal (Bilibili embed) -->
   <div class="overlay hidden" id="rules-overlay">
     <div class="modal wide video-modal">
       <div class="modal-title" data-i18n="howto">规则说明</div>
@@ -149,10 +149,10 @@
     </div>
   </div>
 
-  <!-- 飞行动画层 -->
+  <!-- Fly animation layer -->
   <div id="fly-layer"></div>
 
-  <!-- 竖屏提示（移动端） -->
+  <!-- Portrait hint (mobile) -->
   <div class="overlay-rotate hidden" id="rotate-overlay">
     <div class="rotate-box">
       <div class="rotate-icon">📱</div>

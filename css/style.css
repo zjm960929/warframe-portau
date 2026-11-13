@@ -1,4 +1,4 @@
-/* Portau 波陶 —— 网页版样式（Tau 科幻风） */
+/* Portau - web version styles (Tau sci-fi theme) */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body { height: 100%; }
@@ -33,7 +33,7 @@ body {
   text-align: center;
 }
 
-/* ---------- 背景 ---------- */
+/* ---------- Background ---------- */
 .bg-img {
   position: fixed;
   left: 0; top: 0;
@@ -57,7 +57,7 @@ body {
   z-index: 1;
 }
 
-/* ---------- 卡牌（标准扑克牌面） ---------- */
+/* ---------- Cards (standard playing-card faces) ---------- */
 .pcard {
   width: 58px;
   height: 80px;
@@ -76,7 +76,7 @@ body {
   transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
-/* 对角索引：左上正放、右下镜像 */
+/* Diagonal indices: upright at top left, mirrored at bottom right */
 .pcard .corner {
   position: absolute;
   top: 2px;
@@ -96,13 +96,13 @@ body {
 .pcard .corner .c-rank { font-weight: 700; font-size: .82em; }
 .pcard .corner .c-suit { font-size: .7em; }
 
-/* 中央大花色 */
+/* Large center suit pip */
 .pcard .pip { font-size: 1.5em; line-height: 1; }
 
 .pcard.red { color: #d40000; }
 .pcard.black { color: #1a1a22; }
 
-/* 鬼牌：白底红字金边，中央 Tau 星系符号 τ */
+/* Joker: red on white with a gold edge, Tau system symbol at the center */
 .pcard.joker {
   color: #c8102e;
   border-color: #dcc06a;
@@ -133,19 +133,19 @@ body {
 
 .pcard.dim { filter: brightness(.5); }
 
-/* 出牌后留下的空牌位：暗色底 */
+/* Empty slot left behind after a card is played: dark fill */
 .pcard.gone {
   background: rgba(8, 11, 30, .75);
   border: 1px dashed rgba(80, 220, 255, .18);
   box-shadow: none;
 }
 
-/* 非我方回合：整手变暗（亮度滤镜，非半透明） */
+/* Not our turn: the whole hand dims (brightness filter, not opacity) */
 .player-row .pcard.turn-dim { filter: brightness(.5); }
 
 .pcard.discard { border-color: rgba(255,93,108,.7); }
 
-/* ---------- 按钮 ---------- */
+/* ---------- Buttons ---------- */
 .btn {
   display: block;
   width: 220px;
@@ -178,7 +178,7 @@ body {
 
 .btn:hover { filter: brightness(1.12); }
 
-/* ---------- 主菜单 ---------- */
+/* ---------- Main menu ---------- */
 #screen-menu {
   display: flex;
   flex-direction: column;
@@ -188,7 +188,7 @@ body {
   overflow-y: auto;
 }
 
-/* ---------- 矮屏（手机横屏）紧凑模式：保证作者信息可见 ---------- */
+/* ---------- Short-screen (phone landscape) compact mode: keeps the author info visible ---------- */
 @media (max-height: 560px) {
   #screen-menu { padding: 10px 20px; }
   .title { font-size: 34px; letter-spacing: 2px; padding-left: 2px; }
@@ -211,7 +211,7 @@ body {
   font-size: 48px;
   font-weight: 700;
   letter-spacing: 4px;
-  /* 补偿字距尾随空隙，保证 flex 居中时字形真正居中 */
+  /* Offset trailing letter-spacing so flex centering truly centers the glyphs */
   padding-left: 4px;
   line-height: 1.15;
   color: #ffffff;
@@ -219,7 +219,7 @@ body {
   animation: titleGlow 1.6s ease-in-out infinite alternate;
 }
 
-/* 呼吸式红光（呼应鬼牌抢夺的 slotPulseCap） */
+/* Pulsing red glow (echoes slotPulseCap on a Joker capture) */
 @keyframes titleGlow {
   from { text-shadow: 0 0 6px rgba(255, 93, 108, .25), 0 0 14px rgba(255, 93, 108, .15); }
   to { text-shadow: 0 0 12px rgba(255, 93, 108, .75), 0 0 28px rgba(255, 93, 108, .45); }
@@ -247,7 +247,7 @@ body {
   color: #8fa3d8;
   margin-bottom: 10px;
   letter-spacing: 2px;
-  /* 补偿字距尾随空隙（text-align 居中用 text-indent） */
+  /* Offset trailing letter-spacing (text-indent centers the text under text-align) */
   text-indent: 2px;
   text-align: center;
 }
@@ -273,7 +273,7 @@ body {
 
 .diff-name { font-size: 16px; font-weight: 700; line-height: 1.6; }
 
-/* ---------- 菜单面板内：作者信息（背景音乐按钮下方） ---------- */
+/* ---------- Inside the menu panel: author info (below the BGM button) ---------- */
 .menu-footer {
   margin-top: 14px;
   display: flex;
@@ -299,14 +299,14 @@ body {
 
 .menu-footer a:hover { color: #35e0ff; transform: translateY(-2px); }
 
-/* ---------- 动画期禁用对局内按钮 ---------- */
+/* ---------- Disable in-game buttons during animations ---------- */
 body.anim .nav-back,
 body.anim .nav-bgm {
   pointer-events: none;
   opacity: .5;
 }
 
-/* ---------- 对局页 ---------- */
+/* ---------- Game screen ---------- */
 #screen-game {
   display: flex;
   flex-direction: column;
@@ -393,19 +393,19 @@ body.anim .nav-bgm {
 
 .turnbar {
   text-align: center;
-  /* 补偿字距尾随空隙（text-align 居中用 text-indent） */
+  /* Offset trailing letter-spacing (text-indent centers the text under text-align) */
   text-indent: 2px;
   padding: 4px 0;
   font-size: 14px;
   letter-spacing: 2px;
   flex-shrink: 0;
-  /* 预留文字高度：空文案与有文案等高，避免发牌结束后牌槽区上移 */
+  /* Reserve text height: empty and filled text match, so the board does not shift up after dealing */
   min-height: calc(1.4em + 8px);
 }
 .turn-me { color: #ffd166; }
 .turn-ai { color: #8fa3d8; }
 
-/* ---------- 手牌（上下贴边，面积放大） ---------- */
+/* ---------- Hands (flush to the top and bottom edges, enlarged) ---------- */
 .hand-row {
   display: flex;
   justify-content: center;
@@ -415,7 +415,7 @@ body.anim .nav-bgm {
 }
 
 .ai-row .pcard {
-  filter: brightness(.55); /* 变暗提示不可操作（非半透明） */
+  filter: brightness(.55); /* Dimmed to signal non-interactive (not transparent) */
   width: 15.5vh;
   height: 21.5vh;
   max-width: 112px;
@@ -428,8 +428,8 @@ body.anim .nav-bgm {
 
 .player-row .pcard { width: 18vh; height: 25vh; max-width: 127px; max-height: 175px; font-size: 26px; cursor: pointer; }
 
-/* ---------- 牌槽棋盘（垂直居中，面积放大） ---------- */
-/* 开局阶段隐藏（透明+下移），发牌完毕后淡入升起 */
+/* ---------- Slot board (vertically centered, enlarged) ---------- */
+/* Hidden during the opening (transparent and shifted down); fades in and rises once dealing ends */
 .board {
   width: 100%;
   flex: 1 1 auto;
@@ -541,13 +541,13 @@ body.anim .nav-bgm {
   100% { opacity: 0; transform: translate(-50%, -18px); }
 }
 
-/* ---------- 操作 ---------- */
+/* ---------- Actions ---------- */
 .actionbar { display: flex; align-items: center; justify-content: center; height: 40px; padding: 0; flex-shrink: 0; }
-/* 固定占位：出现/隐藏不推动牌槽区 */
+/* Fixed footprint: showing or hiding never shifts the board */
 .actionbar.hidden { display: flex !important; visibility: hidden; }
 .actionbar .mini { width: 160px; font-size: 13px; line-height: 2; margin: 0 auto; }
 
-/* ---------- 遮罩与弹窗 ---------- */
+/* ---------- Overlay and modals ---------- */
 .overlay {
   position: absolute;
   left: 0; top: 0;
@@ -580,10 +580,10 @@ body.anim .nav-bgm {
 
 .modal.wide { width: 520px; }
 
-/* 规则视频弹窗 */
+/* Rules video modal */
 .video-modal { width: 660px; max-width: 94vw; }
 
-/* 高度用视口公式：桌面 16:9，手机横屏按屏高压缩（部分移动浏览器不支持 aspect-ratio） */
+/* Height from a viewport formula: 16:9 on desktop, compressed by screen height in phone landscape (some mobile browsers lack aspect-ratio support) */
 .video-wrap {
   width: 100%;
   height: min(53vw, 52vh);
@@ -599,7 +599,7 @@ body.anim .nav-bgm {
 .modal-sub { font-size: 12px; color: #8fa3d8; text-align: center; margin-bottom: 12px; }
 .modal .btn { width: auto; min-width: 200px; padding-left: 26px; padding-right: 26px; }
 
-/* ---------- 开局抽牌 ---------- */
+/* ---------- Opening draw ---------- */
 .draw-stage {
   display: flex;
   flex-direction: column;
@@ -609,7 +609,7 @@ body.anim .nav-bgm {
 }
 .draw-stage.shifted { transform: translateY(-22px); }
 
-.overlay-title { font-size: 26px; font-weight: 700; letter-spacing: 4px; /* 补偿字距尾随空隙 */ padding-left: 4px; margin-bottom: 6px; text-align: center; }
+.overlay-title { font-size: 26px; font-weight: 700; letter-spacing: 4px; /* Offset trailing letter-spacing */ padding-left: 4px; margin-bottom: 6px; text-align: center; }
 .overlay-sub { font-size: 13px; color: #8fa3d8; margin-bottom: 20px; text-align: center; }
 
 .pool-row {
@@ -624,7 +624,7 @@ body.anim .nav-bgm {
 .pool-slot { flex: 1 1 0; min-width: 0; max-width: 52px; height: 9vw; max-height: 70px; }
 .pool-slot .pcard { width: 100%; height: 100%; cursor: pointer; }
 
-/* 揭示区：固定占位（不参与布局变化，避免动画结束瞬移），仅淡入上浮 */
+/* Reveal area: fixed footprint (no layout change, so no jump when the animation ends), fade in and rise only */
 .draw-result {
   height: 140px;
   opacity: 0;
@@ -646,13 +646,13 @@ body.anim .nav-bgm {
 }
 .draw-frame .pcard { width: 100%; height: 100%; animation: revealIn .28s ease; }
 
-/* 纯淡入：飞入克隆卡已完成缩放，真实牌面直接以 1:1 出现（不再二次缩放） */
+/* Fade only: the flying clone already handles scaling, so the real face appears at 1:1 (no second scale) */
 @keyframes revealIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
 
-.vs { font-size: 18px; font-weight: 700; color: #35e0ff; letter-spacing: 2px; /* 补偿字距尾随空隙 */ padding-left: 2px; }
+.vs { font-size: 18px; font-weight: 700; color: #35e0ff; letter-spacing: 2px; /* Offset trailing letter-spacing */ padding-left: 2px; }
 
 .draw-msg {
   margin-top: 14px;
@@ -669,15 +669,15 @@ body.anim .nav-bgm {
   50% { opacity: .45; }
 }
 
-/* ---------- 结算 ---------- */
-.result-title { font-size: 32px; font-weight: 700; text-align: center; letter-spacing: 5px; /* 补偿字距尾随空隙 */ padding-left: 5px; margin-bottom: 8px; }
+/* ---------- Results ---------- */
+.result-title { font-size: 32px; font-weight: 700; text-align: center; letter-spacing: 5px; /* Offset trailing letter-spacing */ padding-left: 5px; margin-bottom: 8px; }
 .result-title.player_win { color: #ffd166; text-shadow: 0 0 16px rgba(255,209,102,.5); }
 .result-title.ai_win { color: #ff8f9c; }
 .result-title.draw { color: #9fd8ff; }
 
 .result-score { text-align: center; font-size: 18px; color: #dfe8ff; margin-bottom: 14px; }
 
-/* ---------- 飞行动画层 ---------- */
+/* ---------- Flight animation layer ---------- */
 #fly-layer {
   position: fixed;
   left: 0; top: 0;
@@ -701,7 +701,7 @@ body.anim .nav-bgm {
 .fly-card.draw { transition: transform .36s ease-out; }
 .fly-card.deal { transition: transform .28s ease-out; }
 
-/* 补救动画：弃牌下移渐隐 */
+/* Remedy animation: discarded card slides down and fades out */
 .fly-card.fade-down { transition: transform .38s ease-in, opacity .38s ease-in; }
 .fly-card.fade-down.out { transform: translateY(90px); opacity: 0; }
 
@@ -721,12 +721,12 @@ body.anim .nav-bgm {
   box-shadow: 0 0 14px rgba(255,209,102,.3);
 }
 
-/* 窄屏（手机竖屏）提示旋转到横屏体验更佳 */
+/* Narrow screen (phone portrait): suggest rotating to landscape for a better view */
 @media (orientation: portrait) and (max-width: 600px) {
   .pool-slot { height: 14vw; max-height: 70px; }
 }
 
-/* ---------- 无障碍：用户偏好减弱动画时，关闭装饰性动画并加速飞行 ---------- */
+/* ---------- Accessibility: when the user prefers reduced motion, turn off decorative animations and speed up flights ---------- */
 @media (prefers-reduced-motion: reduce) {
   .title,
   .slot.glow,
@@ -736,7 +736,7 @@ body.anim .nav-bgm {
   .fly-card { transition-duration: .05s !important; }
 }
 
-/* ---------- 移动端竖屏提示 ---------- */
+/* ---------- Mobile portrait notice ---------- */
 .overlay-rotate {
   position: fixed;
   left: 0; top: 0;
@@ -762,10 +762,10 @@ body.anim .nav-bgm {
   100% { transform: rotate(90deg); }
 }
 
-.rotate-text { margin-top: 18px; font-size: 18px; font-weight: 700; letter-spacing: 2px; /* 补偿字距尾随空隙 */ text-indent: 2px; color: #dfe8ff; }
+.rotate-text { margin-top: 18px; font-size: 18px; font-weight: 700; letter-spacing: 2px; /* Offset trailing letter-spacing */ text-indent: 2px; color: #dfe8ff; }
 .rotate-sub { margin-top: 8px; font-size: 13px; color: #8fa3d8; }
 
-/* ---------- 桌面大屏：UI 分级放大，铺满全屏 ---------- */
+/* ---------- Desktop large screens: scale the UI up to fill the viewport ---------- */
 @media (min-width: 1100px) and (orientation: landscape) {
   .title { font-size: 64px; -webkit-text-stroke: 3px #7a0e1e; }
   .deco-line { width: 300px; }

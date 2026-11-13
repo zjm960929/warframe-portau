@@ -1,5 +1,5 @@
-/* Portau 波陶 —— 核心规则
- * UMD 封装：浏览器挂载 window.PortauCore，Node 下 module.exports（可直接跑自测脚本）
+/* Portau - core rules
+ * UMD wrapper: browsers get window.PortauCore, Node gets module.exports (self-test scripts run directly)
  */
 (function (root, factory) {
   const api = factory();
@@ -93,7 +93,7 @@
   }
 
   // ---------- engine ----------
-  // 建局：仅洗牌，手牌与牌槽全空（初始牌/手牌由调用方按节奏抽取）
+  // Game setup: shuffle only; hands and slots stay empty (the caller draws the opening card and hands on cue)
   function createState(difficulty) {
     const deck = createDeck();
     return {
@@ -111,7 +111,7 @@
     };
   }
 
-  // 从牌堆抽 1 张普通牌放到对应牌槽（开局初始牌）
+  // Draw 1 normal card from the deck into its matching slot (the opening card)
   function drawInitialCard(state) {
     const normalIdx = [];
     for (let i = 0; i < state.deck.length; i++) {
@@ -123,7 +123,7 @@
     return init;
   }
 
-  // 发牌：双方各 4 张（明牌）
+  // Deal: 4 cards per side, face up
   function dealHands(state) {
     for (let i = 0; i < 4; i++) {
       state.hands.player.push(state.deck.pop());

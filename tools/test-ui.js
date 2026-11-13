@@ -1,8 +1,8 @@
-// tools/test-ui.js —— 网页版无头 DOM 端到端冒烟测试（Node 运行，无需浏览器）
-// 模拟最小 DOM，驱动完整对局：开局抽牌 → 初始牌 → 发牌 → 自动打完整局 → 结算 → 再来一局
+// tools/test-ui.js - headless DOM end-to-end smoke test for the web build (runs in Node, no browser)
+// Simulates a minimal DOM and drives a full match: opening draw -> initial card -> deal -> auto-play to the end -> result -> play again
 'use strict';
 
-// ---------- 最小 DOM 垫片 ----------
+// ---------- Minimal DOM shim ----------
 const registry = {};       // id -> El
 const floats = {};         // data-float -> El
 let bodyEl = null;
@@ -36,7 +36,7 @@ class El {
   set innerHTML(v) {
     this._html = String(v);
     this.children = [];
-    // 通用解析：注册所有带 id 的 div，并建立 dataset
+    // Generic parse: register every div with an id and build its dataset
     const tagRe = /<div\b([^>]*)>/g;
     let m;
     while ((m = tagRe.exec(this._html))) {
@@ -47,7 +47,7 @@ class El {
       const dm = attrs.match(/data-id="([^"]+)"/); if (dm) el.dataset.id = dm[1];
       const di = attrs.match(/data-idx="([^"]+)"/); if (di) el.dataset.idx = di[1];
       if (this.id === 'board-inner') {
-        // board-inner 的直接子级是 13 个 slot-wrap（供 children[i] 索引）
+        // board-inner's direct children are 13 slot-wraps (indexed via children[i])
         if (el.hasClass('slot-wrap')) this.children.push(el);
         if (el.hasClass('slot')) {
           const wrap = this.children[this.children.length - 1];
@@ -127,9 +127,9 @@ global.innerHeight = 800;
 global.matchMedia = function () { return { matches: false }; };
 global.addEventListener = function () {};
 global.localStorage = { _s: {}, getItem: function (k) { return this._s[k] !== undefined ? this._s[k] : null; }, setItem: function (k, v) { this._s[k] = v; } };
-// 无 AudioContext → 音效静默
+// No AudioContext -> sound effects stay silent
 
-// ---------- 载入代码 ----------
+// ---------- Load code ----------
 const Core = require(__dirname + '/../js/core.js');
 global.PortauCore = Core;
 require(__dirname + '/../js/ui.js');
@@ -149,48 +149,48 @@ function check(name, ok) {
 }
 
 async function main() {
-  // 1. 启动对局
+  // 1. Start the match
   click('btn-start');
   await sleep(100);
-  check('对局界面显示', !el('screen-game').hasClass('hidden'));
-  check('开局抽牌层显示', !el('opening-overlay').hasClass('hidden'));
-  check('牌堆 56 张（未发牌）', num('deck-num') === '56');
-  check('开局前手牌为空', el('player-hand').innerHTML === '');
+  check('game screen shown', !el('screen-game').hasClass('hidden'));
+  check('opening draw overlay shown', !el('opening-overlay').hasClass('hidden'));
+  check('deck 56 cards (undealt)', num('deck-num') === '56');
+  check('hand empty before opening', el('player-hand').innerHTML === '');
 
-  // 2. 玩家抽牌（点第 3 张）
+  // 2. Player draws (click the 3rd card)
   const poolBack = el('pool-row').children[2]._pcard;
   el('pool-row').dispatch('click', { target: poolBack });
   await sleep(120);
-  check('抽牌后界面已上移', el('draw-stage').hasClass('shifted'));
-  check('牌背保留到克隆卡出现', poolBack.style.visibility !== 'hidden');
+  check('draw stage shifted up after pick', el('draw-stage').hasClass('shifted'));
+  check('card back kept until clone appears', poolBack.style.visibility !== 'hidden');
   await sleep(600);
-  check('上移后牌背隐藏（克隆卡已接管）', poolBack.style.visibility === 'hidden');
-  check('揭示区展开', el('draw-result').hasClass('show'));
+  check('card back hidden after shift (clone took over)', poolBack.style.visibility === 'hidden');
+  check('reveal area expanded', el('draw-result').hasClass('show'));
 
-  // 3. 等待 AI 抽牌与揭示
+  // 3. Wait for AI draw and reveal
   await sleep(2600);
-  check('双方已揭示', el('frame-player').innerHTML !== '' && el('frame-ai').innerHTML !== '');
-  check('先手信息显示', el('draw-msg').textContent.indexOf('先手') >= 0);
+  check('both sides revealed', el('frame-player').innerHTML !== '' && el('frame-ai').innerHTML !== '');
+  check('first-player info shown', el('draw-msg').textContent.indexOf('先手') >= 0);
 
-  // 4. 等待初始牌 + 发牌动画完成
+  // 4. Wait for the initial card and deal animation
   const st1 = state();
   const dealtAt = Date.now();
   while (Date.now() - dealtAt < 12000) {
     await sleep(200);
     if (flags().animating === false && state().hands.player.length === 4) break;
   }
-  check('发牌完成：双方各 4 张', state().hands.player.length === 4 && state().hands.ai.length === 4);
-  check('牌堆 47 张（56-1初始-8手牌）', num('deck-num') === '47' && state().deck.length === 47);
-  check('初始牌在桌面', state().slots.filter(function (s) { return !!s; }).length === 1);
-  check('发牌动画已解锁', flags().animating === false);
+  check('deal complete: 4 cards each', state().hands.player.length === 4 && state().hands.ai.length === 4);
+  check('deck 47 cards (56-1 initial-8 hands)', num('deck-num') === '47' && state().deck.length === 47);
+  check('initial card on board', state().slots.filter(function (s) { return !!s; }).length === 1);
+  check('deal animation unlocked', flags().animating === false);
   const afterDealHtml = el('player-hand').innerHTML;
   if (state().turn === 'player') {
-    check('我方回合手牌无全暗标记', afterDealHtml.indexOf('turn-dim') < 0);
+    check('player hand not dimmed on our turn', afterDealHtml.indexOf('turn-dim') < 0);
   } else {
-    check('魂主回合我方手牌全暗', afterDealHtml.indexOf('turn-dim') >= 0);
+    check('player hand dimmed on soulmaster turn', afterDealHtml.indexOf('turn-dim') >= 0);
   }
 
-  // 5. 自动打完整局
+  // 5. Auto-play the whole match
   let guard = 0;
   const maxGuard = 600;
   while (state().phase === 'playing' && guard < maxGuard) {
@@ -203,40 +203,40 @@ async function main() {
     if (moves.length === 0) continue;
     const m = moves[0];
     const handCard = el('hand-' + m.card.id);
-    if (!handCard) { check('手牌元素存在', false); break; }
+    if (!handCard) { check('hand element exists', false); break; }
     if (m.type === 'play' && m.card.kind === 'normal') {
-      // 双击直出
+      // Double-click plays the card directly
       el('player-hand').dispatch('click', { target: handCard });
       el('player-hand').dispatch('click', { target: handCard });
     } else {
-      // 鬼牌 / 抢夺：选牌 + 点槽
+      // Joker / capture: select the card, then click the slot
       el('player-hand').dispatch('click', { target: handCard });
       const slotEl = el('board-inner').children[m.slot]._slot;
       el('board-inner').dispatch('click', { target: slotEl });
     }
-    // 出牌动画开始：手牌应立即全暗
+    // Play animation starts: the hand should dim immediately
     if (guard === 1 || guard === 2) {
       await sleep(80);
-      check('出牌动画开始手牌立即全暗', el('player-hand').innerHTML.indexOf('turn-dim') >= 0);
+      check('hand dimmed immediately when play animation starts', el('player-hand').innerHTML.indexOf('turn-dim') >= 0);
     }
   }
-  check('对局正常终局', state().phase === 'over');
-  // 终局在出牌动画开始时即判定，结算弹窗要等动画落地——等待就绪
+  check('match ended normally', state().phase === 'over');
+  // The game is decided when the play animation starts, but the result modal waits for the animation to land - wait until ready
   let settle = 0;
   while (flags().animating && settle < 40) { await sleep(150); settle += 1; }
   await sleep(300);
-  check('结算层显示', !el('result-overlay').classList.contains('hidden'));
+  check('result overlay shown', !el('result-overlay').classList.contains('hidden'));
   const scoreMatch = /(\d+)\D+(\d+)/.exec(el('result-score').textContent);
-  check('结算比分渲染',
+  check('result score rendered',
     !!scoreMatch && Number(scoreMatch[1]) === state().result.player && Number(scoreMatch[2]) === state().result.ai);
-  check('动画锁已解锁', flags().animating === false);
+  check('animation lock released', flags().animating === false);
 
-  // 6. 再来一局
+  // 6. Play again
   click('btn-restart');
   await sleep(100);
-  check('重开后回开局抽牌', !el('opening-overlay').classList.contains('hidden'));
-  check('重开后台牌清空', state().slots.every(function (s) { return !s; }) || state().slots.filter(function (s) { return !!s; }).length === 0);
-  check('重开后手牌为空', state().hands.player.length === 0);
+  check('restart returns to opening draw', !el('opening-overlay').classList.contains('hidden'));
+  check('board cleared after restart', state().slots.every(function (s) { return !s; }) || state().slots.filter(function (s) { return !!s; }).length === 0);
+  check('hand empty after restart', state().hands.player.length === 0);
 
   console.log('----------------------------------------');
   console.log('TOTAL: ' + (passed + failed) + '  PASS: ' + passed + '  FAIL: ' + failed);

@@ -1,10 +1,10 @@
-/* Portau 波陶 —— 对局控制器（界面渲染、动画与交互流程） */
+/* Portau - game controller (UI rendering, animation, and interaction flow) */
 (function () {
   'use strict';
   const Core = window.PortauCore;
   const engine = Core.engine, rules = Core.rules, gameUtil = Core.game, ai = Core.ai;
 
-  // ---------- 多语言 ----------
+  // ---------- Localization ----------
   let lang = 'zh';
   const I18N = {
     zh: {
@@ -83,14 +83,14 @@
     }
   };
   function tr(key, vars) {
-    // 用「键是否存在」判断而非真值判断：空字符串是合法译文（如英文版标题后缀）
+    // Test key existence rather than truthiness: an empty string is a valid translation (e.g. the English title suffix)
     const dict = I18N[lang] || {};
     let s = Object.prototype.hasOwnProperty.call(dict, key) ? dict[key]
       : (Object.prototype.hasOwnProperty.call(I18N.zh, key) ? I18N.zh[key] : key);
     if (vars) { for (const k in vars) s = s.split('{' + k + '}').join(vars[k]); }
     return s;
   }
-  // 应用到所有带 data-i18n / data-i18n-title 的静态元素；切换按钮显示另一种语言
+  // Apply to every static element with data-i18n / data-i18n-title; the toggle shows the other language
   function applyI18n() {
     if (document.documentElement) document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
     document.title = tr('doc_title');
@@ -105,7 +105,7 @@
     syncBgmButtons();
   }
 
-  // ---------- 工具 ----------
+  // ---------- Utilities ----------
   const $ = function (id) { return document.getElementById(id); };
   const timers = new Set();
   function t(fn, ms) {
@@ -117,15 +117,15 @@
     timers.forEach(function (id) { clearTimeout(id); });
     timers.clear();
     const fl = $('fly-layer');
-    if (fl) fl.innerHTML = ''; // 清掉飞行中的克隆卡，避免残留在其它界面
+    if (fl) fl.innerHTML = ''; // Clear in-flight clone cards so they do not linger on other screens
   }
 
-  // localStorage 在隐私模式/禁用 Cookie 的浏览器下可能抛异常，做安全包装
+  // localStorage can throw in private mode or with cookies disabled, so wrap it safely
   function lsGet(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
   function lsSet(key, value) {
-    try { localStorage.setItem(key, value); } catch (e) { /* 忽略，退化为会话内偏好 */ }
+    try { localStorage.setItem(key, value); } catch (e) { /* ignore; fall back to a session-only preference */ }
   }
   lang = lsGet('portau_lang') === 'en' ? 'en' : 'zh';
 
@@ -136,7 +136,7 @@
     return r;
   }
 
-  // ---------- 音效（WebAudio 合成） ----------
+  // ---------- Sound effects (WebAudio synthesis) ----------
   let actx = null;
   function audioCtx() {
     if (!actx) {
@@ -173,12 +173,12 @@
     lose: function () { tone(392, 0, 0.15, 0.16); tone(311, 0.15, 0.15, 0.16); tone(261, 0.3, 0.25, 0.16); }
   };
 
-  // ---------- 背景音乐 ----------
-  // 默认关闭；玩家手动开启后记忆偏好（下次进页面自动播放）
+  // ---------- BGM ----------
+  // Off by default; remember the preference once the player turns it on (auto-plays on the next visit)
   let bgmOn = lsGet('portau_bgm') === 'on';
   let bgmStarted = false;
 
-  // 网页加载完成后立即尝试自动播放；被浏览器策略拦截时，退回到「首次任意交互」启动
+  // Try autoplay right after the page loads; if browser policy blocks it, start on the first user interaction
   function tryStartBgm() {
     if (!bgmOn || bgmStarted) return;
     const a = $('bgm-audio');
@@ -190,7 +190,7 @@
     }
   }
 
-  // 移动端 / 平板检测（UA + iPadOS 触屏特征）
+  // Mobile / tablet detection (UA plus iPadOS touch traits)
   function isMobileOrTablet() {
     const ua = navigator.userAgent || '';
     if (/Android|iPhone|iPad|iPod|Mobile|Tablet|HarmonyOS/i.test(ua)) return true;
@@ -209,7 +209,7 @@
     syncBgmButtons();
   }
 
-  // 同步两个音乐开关的显示状态（菜单文字按钮 + 对局内图标按钮）
+  // Sync both music toggle displays (menu text button and in-game icon button)
   function syncBgmButtons() {
     const btnBgm = $('btn-bgm');
     if (btnBgm) btnBgm.textContent = bgmOn ? tr('music_on') : tr('music_off');
@@ -217,13 +217,13 @@
     if (btnIcon) btnIcon.classList.toggle('muted', !bgmOn);
   }
 
-  // ---------- 视图 ----------
+  // ---------- Views ----------
   function toView(c) {
     if (!c) return null;
     return { id: c.id, kind: c.kind, rank: c.rank, label: c.label, symbol: c.symbol, red: !!c.red };
   }
 
-  // 标准扑克牌面：对角索引 + 中央大花色；鬼牌中央 Tau 星系符号 τ + 星标
+  // Standard card face: corner indices plus a large central suit pip; the Joker shows the Tau glyph and a star
   function faceInner(view) {
     if (view.kind === 'joker') {
       return '<div class="corner tl"><span class="c-suit">τ</span></div>' +
@@ -242,14 +242,14 @@
 
   function backHtml(cls) { return '<div class="pcard back ' + (cls || '') + '"></div>'; }
 
-  // ---------- 全局状态 ----------
+  // ---------- Global state ----------
   let state = null;
   let difficulty = 'normal';
   let selectedId = null;
   let legalFlags = [];
   let captureFlags = [];
   let animating = false;
-  // 动画锁：true 时同步 body.anim 类，禁用对局内按钮（返回/音乐），防止动画中途操作
+  // Animation lock: while true, syncs the body.anim class and disables in-game buttons (back/music) to block input mid-animation
   function setAnimating(v) {
     animating = v;
     if (document.body) document.body.classList.toggle('anim', v);
@@ -258,7 +258,7 @@
   let canEndTurn = false;
   let screen = 'menu';
 
-  // ---------- 渲染 ----------
+  // ---------- Rendering ----------
   function renderBoard() {
     let html = '';
     for (let i = 0; i < rules.SLOT_COUNT; i++) {
@@ -285,14 +285,14 @@
       let cls = (small ? 'sm ' : '');
       if (who === 'player') {
         if (selectedId === v.id) cls += 'selected ';
-        // 计算可出状态（决定变暗）：普通牌=槽空或可抢鬼牌；鬼牌=存在空槽
+        // Compute playability (drives dimming): a normal card needs an empty slot or a capturable Joker; a Joker needs any empty slot
         if (v.kind === 'joker') v.playable = state.slots.some(function (s) { return !s; });
         else {
           const occ = state.slots[v.rank - 1];
           v.playable = !occ || occ.kind === 'joker';
         }
         if (discardMode) cls += 'discard ';
-        else if (animating || state.turn !== 'player') cls += 'turn-dim '; // 无法操作（动画中/对方回合）→ 全暗
+        else if (animating || state.turn !== 'player') cls += 'turn-dim '; // Cannot act (animating or opponent turn) -> fully dimmed
         else if (!v.playable) cls += 'dim ';
       }
       const idAttr = who === 'player' ? 'hand-' + v.id : 'aihand-' + v.id;
@@ -316,7 +316,7 @@
     const el = $('turn-text');
     el.textContent = state.turn === 'player' ? tr('tenno_turn') : tr('hunra_thinking');
     el.className = state.turn === 'player' ? 'turn-me' : 'turn-ai';
-    // 回合切换时重渲染我方手牌的明暗状态（静态 HTML 需手动刷新）
+    // Re-render the player hand dimming on turn change (static HTML needs a manual refresh)
     renderHands();
   }
 
@@ -325,7 +325,7 @@
     if (!el) return;
     el.textContent = text;
     el.className = 'float-gain ' + (cls || 'normal');
-    // 重触发动画
+    // Retrigger the animation
     void el.offsetWidth;
     t(function () { el.className = 'float-gain hidden'; }, 1000);
   }
@@ -343,10 +343,10 @@
     t(function () { b.style.display = 'none'; }, 1600);
   }
 
-  // ---------- 飞行克隆卡 ----------
+  // ---------- Flying clone cards ----------
   const FLY_DUR = { slow: 490, draw: 430, deal: 360 };
 
-  // targetEl：落点处真实卡牌的占位元素——克隆卡继承其字号，落地时牌面图案大小无缝衔接
+  // targetEl: placeholder of the real card at the landing point; the clone inherits its font size so the face matches seamlessly on landing
   function spawnFly(view, isBack, from, to, durCls, cb, targetEl) {
     const layer = $('fly-layer');
     const div = document.createElement('div');
@@ -356,9 +356,9 @@
     div.className = cls;
     div.innerHTML = isBack ? '' : faceInner(view);
     if (targetEl && window.getComputedStyle) {
-      try { div.style.fontSize = getComputedStyle(targetEl).fontSize; } catch (e) { /* 保持基础字号 */ }
+      try { div.style.fontSize = getComputedStyle(targetEl).fontSize; } catch (e) { /* keep the base font size */ }
     }
-    // 克隆卡固定为目标尺寸，用 transform 位移+缩放（GPU 合成）飞行，起飞时按起始尺寸等比缩小
+    // The clone keeps the target size and flies via transform translate+scale (GPU compositing), starting scaled down to the source size
     div.style.width = to.width + 'px';
     div.style.height = to.height + 'px';
     div.style.left = '0px';
@@ -374,37 +374,37 @@
       div.style.transform = 'translate(' + ex + ',' + ey + ') translate(-50%,-50%) scale(1)';
     }, 30);
     t(function () {
-      if (div.parentNode) div.parentNode.removeChild(div); // 图层可能已被 clearTimers 清空
+      if (div.parentNode) div.parentNode.removeChild(div); // layer may have been purged by clearTimers
       cb();
     }, FLY_DUR[durCls] || 430);
   }
 
-  // ---------- 屏幕切换 ----------
+  // ---------- Screen switching ----------
   function showScreen(name) {
     screen = name;
     $('screen-menu').classList.toggle('hidden', name !== 'menu');
     $('screen-game').classList.toggle('hidden', name !== 'game');
   }
 
-  // 槽位内实际卡牌的矩形（.slot .pcard 为槽位 92%×94% 且居中）
+  // Rect of the real card inside a slot (.slot .pcard is 92% x 94% of the slot and centered)
   function slotCardRect(slotRect) {
     const w = slotRect.width * 0.92, h = slotRect.height * 0.94;
     return { left: slotRect.left + (slotRect.width - w) / 2, top: slotRect.top + (slotRect.height - h) / 2, width: w, height: h };
   }
 
-  // 牌堆起飞矩形：缩小尺寸，但以牌堆中心为锚（否则起点会偏向牌堆左侧）
+  // Deck launch rect: shrink the size but anchor at the deck center (otherwise the start drifts left of the deck)
   function deckStartRect(from) {
     const w = Math.min(44, from.width), h = Math.min(58, from.height);
     return { left: from.left + (from.width - w) / 2, top: from.top + (from.height - h) / 2, width: w, height: h };
   }
 
-  // 槽位棋盘显隐：开局与发牌期间隐藏，发牌完毕淡入升起
+  // Board visibility: hidden during the opening and dealing, then fades in and rises when dealing ends
   function setBoardVisible(show) {
     const b = $('board');
     if (b) b.classList.toggle('board-show', !!show);
   }
 
-  // ---------- 对局 ----------
+  // ---------- Match ----------
   function startGame() {
     clearTimers();
     setAnimating(false);
@@ -413,23 +413,23 @@
     captureFlags = [];
     discardMode = false;
     canEndTurn = false;
-    // 建局但不发牌：先决定先手，再播发牌动画
+    // Create the match without dealing: decide the first player, then play the dealing animation
     state = engine.createState(difficulty);
     $('ai-name').textContent = tr('ai_name', { d: tr('diff_' + difficulty) });
     $('actionbar').classList.add('hidden');
     $('remedy-overlay').classList.add('hidden');
     $('result-overlay').classList.add('hidden');
     showScreen('game');
-    setBoardVisible(false); // 决定先手与发牌期间不显示牌槽
+    setBoardVisible(false); // Hide slot cards while deciding the first player and dealing
     renderBoard();
     renderHands();
     $('deck-num').textContent = state.deck.length;
-    // 回合提示留空：发牌完成后再显示（发牌途中不应出现「你的回合」）
+    // Leave the turn label empty until dealing ends (no "your turn" text during the deal)
     $('turn-text').textContent = '';
     startOpening();
   }
 
-  // ---------- 开局抽牌 ----------
+  // ---------- Opening draw ----------
   let poolSlots = null;
   let openingBusy = false;
 
@@ -464,7 +464,7 @@
     if (!poolSlots || !poolSlots[idx] || !poolSlots[idx].card) return;
     openingBusy = true;
     const playerCard = poolSlots[idx].card;
-    poolSlots[idx].drawn = true; // 标记已抽，但牌背保留到克隆卡出现
+    poolSlots[idx].drawn = true; // Mark as drawn but keep the back until the clone card appears
     sound.play('draw');
     $('draw-stage').classList.add('shifted');
     $('draw-result').classList.add('show');
@@ -473,7 +473,7 @@
       const backEl = document.querySelector('#pool-' + idx + ' .pcard');
       const from = rect(backEl);
       const to = rect($('frame-player'));
-      if (backEl) backEl.style.visibility = 'hidden'; // 克隆卡即将盖住它
+      if (backEl) backEl.style.visibility = 'hidden'; // The clone card is about to cover it
       if (!from || !to) {
         poolSlots[idx].card = null;
         revealPlayer(playerCard);
@@ -532,19 +532,19 @@
   function beginPlay(first) {
     engine.setFirstPlayer(state, first);
     $('opening-overlay').classList.add('hidden');
-    renderBoard(); // 牌槽此时处于隐藏状态（布局占位保留）
+    renderBoard(); // Slots are hidden at this point (layout placeholders remain)
     renderDealingHands({ player: 0, ai: 0 });
     $('turn-text').textContent = '';
     setAnimating(true);
-    // ① 先为双方发牌；② 发完显示牌槽；③ 过渡结束后初始牌上桌；④ 进入对局
+    // 1) Deal to both sides; 2) show the slots when dealing ends; 3) place the initial card after the transition; 4) enter play
     dealSequence(first, function () {
       renderAll();
       setBoardVisible(true);
-      t(function () { afterBoardReveal(first); }, 520); // 等待棋盘淡入过渡结束
+      t(function () { afterBoardReveal(first); }, 520); // Wait for the board fade-in transition to finish
     });
   }
 
-  // ③ 棋盘显示完成后：初始牌从牌堆飞上牌桌
+  // 3) After the board is shown, fly the initial card from the deck onto the table
   function afterBoardReveal(first) {
     const init = engine.drawInitialCard(state);
     $('deck-num').textContent = state.deck.length;
@@ -559,21 +559,21 @@
     }
     const startRect = deckStartRect(from);
     spawnFly(toView(init), false, startRect, slotCardRect(to), 'deal', function () {
-      renderBoard(); // 初始牌落桌（盖住文字标签）
-      // ④ 正式进入对局
+      renderBoard(); // The initial card lands (covering the text label)
+      // 4) Enter play for real
       enterPlay(first);
     });
   }
 
-  // ④ 解锁输入、显示回合提示、启动回合流程
+  // 4) Unlock input, show the turn label, start the turn flow
   function enterPlay(first) {
-    setAnimating(false); // 先解锁再渲染
+    setAnimating(false); // Unlock before rendering
     setTurnText();
     if (state.turn === 'ai') aiTurn();
     else checkPlayerMoves();
   }
 
-  // 发牌期间的渲染：每方 4 个占位，前 n 张已发亮出牌面
+  // Rendering during the deal: 4 placeholders per side; the first n show their faces
   function renderDealingHands(revealed) {
     function row(who) {
       let html = '';
@@ -597,12 +597,12 @@
   function dealSequence(first, onDone) {
     const order = [];
     const other = first === 'player' ? 'ai' : 'player';
-    for (let i = 0; i < 4; i++) { order.push(first, other); } // 先手先拿牌，交替发
+    for (let i = 0; i < 4; i++) { order.push(first, other); } // The first player draws first; deals alternate
     const revealed = { player: 0, ai: 0 };
     let i = 0;
     function step() {
       if (i >= order.length) {
-        // 发牌完毕：保持动画锁（期间玩家不可操作），由回调继续后续流程
+        // Dealing done: keep the animation lock (no player input) and let the callback continue
         renderAll();
         if (onDone) onDone();
         return;
@@ -634,7 +634,7 @@
     step();
   }
 
-  // ---------- 玩家操作 ----------
+  // ---------- Player actions ----------
   function onHandTap(id) {
     if (screen !== 'game' || state.phase !== 'playing') return;
     if (state.turn !== 'player' || animating) return;
@@ -644,7 +644,7 @@
     const card = state.hands.player.find(function (c) { return c.id === id; });
     if (!card) return;
 
-    // 再次点击已选中的普通牌：直接出牌（鬼牌必须手动选槽）
+    // Tapping the selected normal card again plays it directly (a Joker must pick a slot manually)
     if (selectedId === id) {
       if (card.kind === 'normal') {
         const occupied = state.slots[card.rank - 1];
@@ -654,7 +654,7 @@
       return;
     }
 
-    // 计算合法槽位
+    // Compute legal slots
     const flags = new Array(rules.SLOT_COUNT).fill(false);
     const capFlags = new Array(rules.SLOT_COUNT).fill(false);
     if (card.kind === 'joker') {
@@ -702,7 +702,7 @@
     t(function () { el.style.display = 'none'; }, 1200);
   }
 
-  // ---------- 出牌 + 延迟摸牌 ----------
+  // ---------- Playing a card + delayed draw ----------
   function execPlay(who, move) {
     if (animating) return;
     setAnimating(true);
@@ -727,7 +727,7 @@
 
     if (!from || !to) { afterPlay(who, r, move.slot); return; }
 
-    // 手牌原位留空占位（其余牌不动）
+    // Leave a placeholder at the old hand position (other cards stay put)
     renderHandsWithGap(who, r.handIndex);
     $('deck-num').textContent = state.deck.length;
 
@@ -785,12 +785,12 @@
   }
 
   function startDrawAnimation(who, r, slotIdx) {
-    // 抢夺：鬼牌从牌桌飞回手牌空位
+    // Capture: the Joker flies from the table back into the free hand slot
     if (r.capturedCard) {
       const capGap = document.getElementById(who === 'player' ? 'hand-gap' : 'aihand-gap');
       const slotEl = document.getElementById('board-inner').children[slotIdx] ?
         document.getElementById('board-inner').children[slotIdx].querySelector('.slot') : null;
-      // 起点用槽内真实卡牌矩形（92%×94% 居中），与桌上实体卡完全重合
+      // Start from the real card rect inside the slot (92% x 94%, centered) so it overlaps the table card exactly
       const from = slotEl ? slotCardRect(rect(slotEl)) : null;
       const to = rect(capGap);
       if (!from || !to) {
@@ -837,7 +837,7 @@
   }
 
   function afterPlay(who, r, slotIdx) {
-    // 降级路径：无动画
+    // Fallback path: no animation
     if (!r.captured && state.phase !== 'over') {
       const nc = engine.drawCard(state);
       if (nc) engine.insertCard(state, who, r.handIndex, nc);
@@ -854,7 +854,7 @@
     else checkPlayerMoves();
   }
 
-  // ---------- AI 回合 ----------
+  // ---------- AI turn ----------
   function aiTurn() {
     if (state.phase !== 'playing') return;
     t(function () {
@@ -893,7 +893,7 @@
     }, 800 + Math.random() * 700);
   }
 
-  // ---------- 补救 ----------
+  // ---------- Remedies ----------
   function checkPlayerMoves() {
     if (state.phase !== 'playing' || state.turn !== 'player') return;
     const moves = rules.legalMoves(state.hands.player, state.slots);
@@ -904,8 +904,8 @@
     }
   }
 
-  // 补救动画：弃牌克隆卡先同步盖住原位（避免先消失后出现的闪烁），随后向下移动并渐隐
-  // srcEl：源卡牌元素——克隆卡继承其字号，牌面花色数字大小与实体卡一致
+  // Remedy animation: the clone covers the discarded card first to avoid a vanish-then-reappear flicker, then slides down and fades out
+  // srcEl: the source card element; the clone inherits its font size so rank and suit match the real card
   function fadeCardDown(view, fromRect, outDelay, srcEl) {
     const layer = $('fly-layer');
     const div = document.createElement('div');
@@ -913,7 +913,7 @@
     div.className = cls;
     div.innerHTML = faceInner(view);
     if (srcEl && window.getComputedStyle) {
-      try { div.style.fontSize = getComputedStyle(srcEl).fontSize; } catch (e) { /* 保持基础字号 */ }
+      try { div.style.fontSize = getComputedStyle(srcEl).fontSize; } catch (e) { /* keep the base font size */ }
     }
     div.style.left = fromRect.left + 'px';
     div.style.top = fromRect.top + 'px';
@@ -929,7 +929,7 @@
     const cardEl = document.getElementById('hand-' + id);
     const cardView = toView(state.hands.player.find(function (c) { return c.id === id; }));
     const fromRect = rect(cardEl);
-    // 先定位弃牌索引（discardOne 会把它移出手牌）
+    // Locate the discard index first (discardOne removes the card from the hand)
     const discardIdx = state.hands.player.findIndex(function (c) { return c.id === id; });
     const r = engine.discardOne(state, 'player', id);
     if (r.error) { toast(tr('toast_no_discard')); return; }
@@ -937,18 +937,18 @@
     discardMode = false;
     setAnimating(true);
     const newCard = r.newCard;
-    state.hands.player.pop(); // 暂取回新牌（动画结束后放入弃牌空位）
-    // ① 克隆卡先同步盖住弃牌原位，再向下渐隐
+    state.hands.player.pop(); // Hold the new card back (it enters the discard gap after the animation)
+    // 1) The clone covers the discarded position first, then fades downward
     if (fromRect && cardView) fadeCardDown(cardView, fromRect, 0, cardEl);
-    // ② 空出弃牌位：其它手牌保持原位不动
+    // 2) Open the discard gap; other hand cards stay in place
     renderHandsWithGap('player', discardIdx);
-    // ③ 之后播放抽牌动画：牌堆 → 弃牌空位
+    // 3) Then run the draw animation: deck to the discard gap
     t(function () {
       const deckR = rect($('deck-box'));
       const gapEl = document.getElementById('hand-gap');
       const toR = rect(gapEl);
       function done() {
-        // 新牌放入弃牌空位：状态顺序与视觉一致，避免后续渲染时跳位
+        // Insert the new card into the discard gap so state order matches the visuals and later renders do not jump
         const h = state.hands.player;
         h.push(newCard);
         h.splice(h.indexOf(newCard), 1);
@@ -973,7 +973,7 @@
     }, 460);
   }
 
-  // 重新摸牌：逐张把新牌从牌堆飞入占位
+  // Redraw: fly each new card from the deck into its placeholder
   function dealRedrawnHand() {
     const hand = state.hands.player;
     let i = 0;
@@ -1006,7 +1006,7 @@
     aiTurn();
   }
 
-  // ---------- 结算 ----------
+  // ---------- Results ----------
   function finish() {
     setAnimating(false);
     const outcome = state.result.outcome;
@@ -1018,7 +1018,7 @@
     else if (outcome === 'ai_win') sound.lose();
   }
 
-  // ---------- 竖屏检测（移动端弹窗提示，横屏自动消除） ----------
+  // ---------- Portrait detection (prompt on mobile, clears in landscape) ----------
   function checkOrientation() {
     const el = $('rotate-overlay');
     if (!el) return;
@@ -1032,9 +1032,9 @@
   window.addEventListener('orientationchange', checkOrientation);
   checkOrientation();
 
-  // ---------- 事件绑定 ----------
+  // ---------- Event binding ----------
   function bind() {
-    // 菜单
+    // Menu
     document.querySelectorAll('.diff-item').forEach(function (el) {
       el.addEventListener('click', function () {
         document.querySelectorAll('.diff-item').forEach(function (e) { e.classList.remove('active'); });
@@ -1043,14 +1043,14 @@
       });
     });
     $('btn-start').addEventListener('click', function () { tryStartBgm(); startGame(); });
-  // ---------- 规则视频（B站嵌入，iframe 代码保持原始形态） ----------
-  let bgmPausedForVideo = false; // 打开视频前 BGM 是否在播（关闭视频后据此恢复）
-  // 关闭弹窗时移除 iframe 以停止播放，打开时按原始代码重建
+  // ---------- Rules video (Bilibili embed; iframe markup kept as-is) ----------
+  let bgmPausedForVideo = false; // Whether BGM was playing before the video opened (used to restore it on close)
+  // Remove the iframe on close to stop playback; rebuild it from the original markup on open
   const rulesVideoHTML = $('rules-video') ? $('rules-video').outerHTML : '';
 
   function openRulesVideo() {
     const a = $('bgm-audio');
-    // 视频与 BGM 抢声道：打开视频时自动暂停 BGM，关闭后按原状态恢复
+    // The video and BGM share the audio channel: pause BGM when the video opens and restore the prior state on close
     if (bgmOn && a && !a.paused) {
       bgmPausedForVideo = true;
       a.pause();
@@ -1061,7 +1061,7 @@
 
   function closeRulesVideo() {
     const iframe = $('rules-video');
-    if (iframe) iframe.outerHTML = '<div id="rules-video"></div>'; // 移除 iframe，停止播放
+    if (iframe) iframe.outerHTML = '<div id="rules-video"></div>'; // Remove the iframe to stop playback
     $('rules-overlay').classList.add('hidden');
     if (bgmPausedForVideo) {
       bgmPausedForVideo = false;
@@ -1072,7 +1072,7 @@
 
     $('btn-rules').addEventListener('click', function () {
       if (isMobileOrTablet()) {
-        // 手机 / 平板：跳转 B站视频页观看（noopener 防止目标页访问来源页）
+        // Phone / tablet: open the Bilibili video page instead (noopener blocks access to the opener)
         window.open(BILI_VIDEO_URL, '_blank', 'noopener');
         return;
       }
@@ -1087,7 +1087,7 @@
       applyI18n();
     });
 
-    // 对局
+    // Match
     $('btn-back').addEventListener('click', function () { if (animating) return; clearTimers(); showScreen('menu'); });
     $('btn-restart').addEventListener('click', startGame);
     $('btn-home').addEventListener('click', function () { if (animating) return; clearTimers(); showScreen('menu'); });
@@ -1107,7 +1107,7 @@
     });
     $('btn-redraw').addEventListener('click', function () {
       if (animating) return;
-      // 先记录旧牌矩形、元素与视图（fullRedraw 会清空手牌）
+      // Record the old rects, elements and views first (fullRedraw clears the hand)
       const oldViews = state.hands.player.map(toView);
       const oldEls = state.hands.player.map(function (c) { return document.getElementById('hand-' + c.id); });
       const oldRects = state.hands.player.map(function (c) { return rect(document.getElementById('hand-' + c.id)); });
@@ -1117,13 +1117,13 @@
       $('remedy-overlay').classList.add('hidden');
       setAnimating(true);
       $('deck-num').textContent = state.deck.length;
-      // 克隆卡先同步盖住 4 张旧牌，再错峰下移渐隐（避免先消失后出现的闪烁）
+      // Clones cover the 4 old cards first, then move down and fade with staggered delays (avoids a flash)
       oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70, oldEls[i]); });
-      // 渲染空占位；牌堆不足 4 张时只放实际发到的张数，避免留下空位
+      // Render empty placeholders; when the deck has fewer than 4 cards, render only the actual count to avoid blank slots
       let ph = '';
       for (let i = 0; i < state.hands.player.length; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
       $('player-hand').innerHTML = ph;
-      // 渐隐完成后逐张发新牌
+      // Deal the new cards one by one after the fades finish
       t(function () { dealRedrawnHand(); }, 450 + 3 * 70);
     });
     $('btn-skip').addEventListener('click', function () {
@@ -1137,7 +1137,7 @@
       else checkPlayerMoves();
     });
 
-    // 手牌 / 牌槽（事件委托）
+    // Hand / slots (event delegation)
     $('player-hand').addEventListener('click', function (e) {
       const el = e.target.closest('.pcard');
       if (el && el.dataset.id) onHandTap(el.dataset.id);
@@ -1147,13 +1147,13 @@
       if (slot && slot.dataset.idx !== undefined) onSlotTap(parseInt(slot.dataset.idx, 10));
     });
 
-    // 开局抽牌（委托）
+    // Opening draw (delegation)
     $('pool-row').addEventListener('click', function (e) {
       const el = e.target.closest('.pool-card');
       if (el && el.dataset.idx !== undefined) onDrawTap(parseInt(el.dataset.idx, 10));
     });
 
-    // 背景音乐：加载后立即尝试自动播放；若被浏览器策略拦截，退回到任意首次交互启动
+    // BGM: try autoplay right after load; if browser policy blocks it, start on the first user interaction
     tryStartBgm();
     ['click', 'keydown', 'touchstart'].forEach(function (type) {
       const fallback = function () {
@@ -1171,7 +1171,7 @@
   bind();
   applyI18n();
 
-  // 调试/测试钩子（不影响正常玩法）
+  // Debug/test hook (does not affect normal play)
   window.__portau = {
     getState: function () { return state; },
     getFlags: function () {

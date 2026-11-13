@@ -1,5 +1,5 @@
-// tools/test-core.js —— 网页版核心逻辑自测（Node 运行）
-// 用法：node tools/test-core.js
+// tools/test-core.js - self-test for web core logic (run with Node)
+// Usage: node tools/test-core.js
 const Core = require('../js/core.js');
 const engine = Core.engine, rules = Core.rules, gameUtil = Core.game, ai = Core.ai;
 
@@ -9,7 +9,7 @@ function test(name, fn) {
   catch (e) { failed += 1; console.log('FAIL ' + name + ' :: ' + e.message); }
 }
 
-test('计分 2/4/7', function () {
+test('scoring 2/4/7', function () {
   const s = new Array(13).fill(null);
   s[12] = gameUtil.makeCard(13, gameUtil.SUITS[0]);
   if (rules.scorePlacement(s, 0) !== 2) throw new Error('edge');
@@ -21,7 +21,7 @@ test('计分 2/4/7', function () {
   if (rules.scorePlacement(s, 10) !== 7) throw new Error('sym');
 });
 
-test('新对局初始状态', function () {
+test('new game initial state', function () {
   for (let i = 0; i < 100; i++) {
     const st = engine.newGame('normal');
     if (st.hands.player.length !== 4 || st.hands.ai.length !== 4) throw new Error('hand');
@@ -31,7 +31,7 @@ test('新对局初始状态', function () {
   }
 });
 
-test('先手出牌后桌面 2 张', function () {
+test('two cards on board after first move', function () {
   for (let i = 0; i < 50; i++) {
     const st = engine.newGame('normal');
     let card = st.hands.player.find(function (c) { return c.kind === 'normal' && !st.slots[c.rank - 1]; });
@@ -44,7 +44,7 @@ test('先手出牌后桌面 2 张', function () {
   }
 });
 
-test('抢夺守恒（deferDraw 模式）', function () {
+test('capture conservation (deferDraw mode)', function () {
   const st = engine.newGame('normal');
   const j = gameUtil.makeJoker();
   st.slots[1] = j;
@@ -58,7 +58,7 @@ test('抢夺守恒（deferDraw 模式）', function () {
   if (st.hands.player.length !== 4 || !st.hands.player.some(function (c) { return c.id === j.id; })) throw new Error('insert');
 });
 
-test('AI 600 局合规（三难度）', function () {
+test('AI 600 games legal (three difficulties)', function () {
   for (const d of ['easy', 'normal', 'hard']) {
     for (let g = 0; g < 200; g++) {
       const st = engine.newGame(d);
@@ -93,7 +93,7 @@ test('AI 600 局合规（三难度）', function () {
   }
 });
 
-test('先手抽牌库 13 张同花色互异', function () {
+test('opening pool 13 distinct ranks of one suit', function () {
   for (let i = 0; i < 30; i++) {
     const pool = gameUtil.createOpeningPool();
     if (pool.cards.length !== 13) throw new Error('len');
@@ -102,7 +102,7 @@ test('先手抽牌库 13 张同花色互异', function () {
   }
 });
 
-test('createState 不发牌 / dealHands 各4张', function () {
+test('createState deals nothing / dealHands gives 4 each', function () {
   for (let i = 0; i < 30; i++) {
     const st = engine.createState('normal');
     if (st.hands.player.length !== 0 || st.hands.ai.length !== 0) throw new Error('createState dealt');
