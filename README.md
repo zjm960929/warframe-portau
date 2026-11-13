@@ -15,14 +15,14 @@
 
 1. **定先手**：双方从同一花色的 A~K 中各抽一张比大小，点数大者先手（同花色保证不会同点）。
 2. **发牌**：从牌堆抽 1 张普通牌作为初始牌放进对应牌槽，双方各发 4 张手牌，牌堆剩 47 张。
-3. **出牌**：普通牌只能放进自己点数对应的槽；鬼牌可以放进任意空槽。
-4. **结算**：13 个牌槽填满后比较总分，高者胜；若双方连续两次结束回合，也提前结算。
+3. **出牌**：普通牌只能放进自己点数对应的槽；鬼牌可以放进任意空槽。每打出一张，立即从牌堆补 1 张（抢夺时不补）。对应的槽已被普通牌占住时，这张牌本局就打不出去，只能弃掉或整手重摸换掉。
+4. **结算**：13 个牌槽填满后比较总分，高者胜（同分平局）；若连续两次选择「结束回合」，也提前结算。
 
 ### 计分
 
 | 落牌位置 | 得分 |
 | --- | --- |
-| 左右任一侧没有牌（桌面边缘，或落点两侧为空） | **+2** |
+| 左右任一侧没有牌（桌边，或该侧暂无牌） | **+2** |
 | 夹在两牌之间，两侧间隔不相等 | **+4** |
 | 正好夹在正中间（两侧间隔相等） | **+7** |
 
@@ -32,15 +32,17 @@
 
 - 鬼牌放进任意空槽，按上表正常计分。
 - 之后谁打出与该槽点数相同的普通牌，就能**抢夺**：普通牌盖住鬼牌，这张鬼牌由抢夺者收入手中。
-- 抢夺本身 **0 分**，并且不补牌——相当于用一次出牌机会换一张鬼牌。
+- 抢夺本身 **0 分**，并且不补牌：出掉 1 张普通牌、收回 1 张鬼牌，手牌数不变。
 
 ### 没有可出的牌
 
 | 选择 | 代价与效果 |
 | --- | --- |
-| 弃 1 摸 1 | **-2 分**；需要当前分数 ≥ 2 且牌堆非空；摸到的新牌可以立即打出，也可以选择结束回合 |
-| 整手重摸 | 立即结束回合（牌堆不足 4 张时按剩余张数发） |
+| 弃 1 摸 1 | **-2 分**；每回合限一次，需要当前分数 ≥ 2 且牌堆非空；摸到的新牌可立即打出，也可直接结束回合，打不出时自动结束回合 |
+| 整手重摸 | 立即结束回合；牌堆不足 4 张时按剩余张数发，牌堆为空时不可用 |
 | 直接结束回合 | 连续两次「结束回合」后对局直接结算 |
+
+牌堆摸空后不再补牌，手牌会少于 4 张，此时只能选择「直接结束回合」。
 
 ### 魂主（AI）
 
@@ -50,12 +52,14 @@
 | 普通 | 贪心：每次挑当前得分最高的落点 |
 | 困难 | 在得分基础上评估「给对手送了多少分」和「自己后续还能连出几个 +7」，并给抢夺额外加权 |
 
+没有可出的牌时，魂主也使用上面同样的三种补救方式。
+
 ## 特性
 
 - 中英双语界面，一键切换并记住偏好
 - 完整动画：开局抽牌揭示、先手判定、发牌、出牌飞行、摸牌补位、鬼牌易主、弃牌与整手重摸
 - WebAudio 合成音效 + 本地背景音乐，主菜单与对局内都能开关
-- Tau 科幻风界面；桌面大屏分级放大，窄屏横屏提示，系统开启「减弱动态效果」时关闭装饰性动画
+- Tau 科幻风界面；桌面大屏分级放大，窄屏横屏提示，系统开启「减弱动态效果」时关闭循环装饰动画并加快飞牌
 - 规则说明内嵌 B 站视频（手机端直接跳转 B 站观看）
 - 无后端、无追踪；除规则视频外不发起任何外部请求
 - 仅用 HTML / CSS / 原生 JS，没有第三方运行时依赖
@@ -150,20 +154,20 @@ A web recreation of **Portau**, the poker-like card game shown in the official *
 
 ## How to Play
 
-The deck holds 56 cards: 52 suited cards (A–K in four suits) plus 4 Jokers. The table has 13 fixed slots, laid out left to right as A, 2 … K. Both sides hold 4 face-up cards and take turns.
+The deck holds 56 cards: 52 suited cards (A–K in four suits) plus 4 Jokers. The table has 13 fixed slots, laid out left to right as A, 2 … K. Each side starts with 4 face-up cards, and both take turns playing one card.
 
 ### A Round
 
 1. **Decide the first player**: each side draws one card from the same suit (A–K) and compares ranks; the higher rank goes first. A shared suit guarantees no tie.
 2. **Deal**: one random normal card is drawn from the deck as the starting card and placed in its slot; each side then gets 4 cards, leaving 47 in the deck.
-3. **Play**: a normal card may only go into the slot matching its own rank; a Joker may go into any empty slot.
-4. **Score**: once all 13 slots are filled, the higher total wins. Two consecutive "end turn" choices also end the game early.
+3. **Play**: a normal card may only go into the slot matching its own rank; a Joker may go into any empty slot. After each play you immediately draw 1 card from the deck (a capture draws nothing). If another normal card already sits in that slot, your card can never be played this game - discard it or redraw your hand.
+4. **Score**: once all 13 slots are filled, the higher total wins (a tie is a draw). Two consecutive "end turn" choices also end the game early.
 
 ### Scoring
 
 | Where the card lands | Points |
 | --- | --- |
-| No card on at least one side (table edge, or both sides empty) | **+2** |
+| No card on at least one side (the table edge, or that side is empty) | **+2** |
 | Between two cards, with unequal gaps on each side | **+4** |
 | Exactly in the middle (equal gaps on both sides) | **+7** |
 
@@ -173,15 +177,17 @@ A "gap" is the difference between slot indexes; only the two nearest cards on ea
 
 - A Joker may be placed in any empty slot and scores normally by the table above.
 - Whoever later plays the normal card of that slot's rank **captures** it: the rank card covers the Joker, and the capturer takes that Joker into their hand.
-- A capture is worth **0 points** and draws no replacement card — you spend a turn to gain a Joker.
+- A capture is worth **0 points** and draws no replacement card: you spend one normal card and take one Joker, so the hand size stays the same.
 
 ### When You Have No Legal Move
 
 | Choice | Cost and effect |
 | --- | --- |
-| Discard 1, draw 1 | **−2 points**; requires a score of at least 2 and a non-empty deck; the new card may be played immediately or you may end the turn |
-| Redraw the whole hand | Ends your turn at once (if the deck has fewer than 4 cards, you get what is left) |
+| Discard 1, draw 1 | **−2 points**; once per turn, requires a score of at least 2 and a non-empty deck; the new card may be played immediately or you may end the turn, and the turn ends automatically if it cannot be played |
+| Redraw the whole hand | Ends your turn at once; if the deck has fewer than 4 cards you get what is left, and it is unavailable with an empty deck |
 | End the turn | After two consecutive "end turn" choices the game ends immediately |
+
+Once the deck is empty no cards are drawn any more, hands stay below 4 cards and ending the turn is the only option left.
 
 ### The AI ("Soul Master")
 
@@ -191,12 +197,14 @@ A "gap" is the difference between slot indexes; only the two nearest cards on ea
 | Normal | greedy: always takes the highest-scoring placement |
 | Hard | weighs points against what it gives away and how many future +7s it keeps, with extra weight on captures |
 
+With no legal move, the AI chooses among the same three remedies.
+
 ## Features
 
 - Bilingual UI (Chinese / English) with a one-click toggle that remembers your choice
 - Full animation set: opening draw reveal, first-player showdown, dealing, card flight, draw refill, Joker changing hands, discard and full-hand redraw
 - WebAudio-synthesised sound effects plus local background music, toggleable from the menu and in game
-- Tau sci-fi look; tiered scaling on large desktop screens, landscape hint on narrow screens, decorative animation disabled under "reduce motion"
+- Tau sci-fi look; tiered scaling on large desktop screens, landscape hint on narrow screens, looping decorative animations disabled and card flights sped up under "reduce motion"
 - Rules video embedded from Bilibili (opens on Bilibili on mobile)
 - No backend, no tracking; the rules video is the only external request
 - HTML, CSS and vanilla JS only — no third-party runtime dependencies
