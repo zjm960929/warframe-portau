@@ -72,6 +72,7 @@ warframe-portau/
 ├─ tools/test-ui.js    无头 DOM 端到端冒烟测试（20 余项，含终局与重开流程）
 ├─ images/bg.jpg       背景图
 ├─ audio/bgm.mp3       背景音乐
+├─ LICENSE             代码的 MIT 许可
 ├─ .nojekyll           GitHub Pages 不做 Jekyll 处理
 └─ .gitignore
 ```
@@ -122,12 +123,14 @@ GitHub Pages：`main` 分支根目录 + `.nojekyll`。推送到 `main` 后等 Pa
 ## 素材与致谢
 
 - 游戏设计来自 Digital Extremes 的《Warframe》官方直播（PMCF 环节）；本项目是独立的非商业复刻，与 Digital Extremes 无关。
+- 背景图与背景音乐取自《Warframe》官方素材，版权归 Digital Extremes，仅用于本非商业同人项目。
 - 规则视频来自 B 站 [@ZJM](https://space.bilibili.com/16730771)。
-- 背景图与背景音乐随仓库分发，不引用 CDN。
+- 所有资源随仓库分发，不引用 CDN。
 
 ## 授权
 
-《Warframe》的名称、美术与游戏规则归 Digital Extremes 所有。本仓库代码用于学习与个人娱乐，按「现状」提供，不附带任何担保。
+- **代码**：以 [MIT 许可](LICENSE)发布，可自由使用、修改与分发，需保留版权声明。
+- **素材**：《Warframe》的名称、美术、音乐等素材归 Digital Extremes 所有，**不在 MIT 许可范围内**，请勿单独抽取使用或用于商业用途。
 
 ## 关注作者
 
@@ -210,6 +213,7 @@ warframe-portau/
 ├─ tools/test-ui.js    Headless DOM end-to-end smoke test (20+ checks, including the result and restart flow)
 ├─ images/bg.jpg       Background image
 ├─ audio/bgm.mp3       Background music
+├─ LICENSE             MIT license for the code
 ├─ .nojekyll           Tells GitHub Pages to skip Jekyll
 └─ .gitignore
 ```
@@ -260,12 +264,14 @@ GitHub Pages from the repository root of `main`, with `.nojekyll`. After pushing
 ## Credits
 
 - Game design comes from Digital Extremes' official *Warframe* livestream (the PMCF segment). This is an independent, non-commercial recreation and is not affiliated with Digital Extremes.
+- The background image and music are taken from official *Warframe* materials; all rights belong to Digital Extremes. They are used only for this non-commercial fan project.
 - Rules video by [@ZJM](https://space.bilibili.com/16730771) on Bilibili.
-- Background image and music ship with the repository; no CDN is used.
+- All assets ship with the repository; no CDN is used.
 
 ## License
 
-The *Warframe* name, artwork and game rules belong to Digital Extremes. The code in this repository is for learning and personal entertainment, provided "as is" without warranty of any kind.
+- **Code**: released under the [MIT License](LICENSE) - free to use, modify and redistribute, provided the copyright notice is kept.
+- **Assets**: the *Warframe* name, artwork, music and other assets belong to Digital Extremes and are **not covered by the MIT license**. Do not extract or reuse them separately, or use them commercially.
 
 ## Follow the Author
 
