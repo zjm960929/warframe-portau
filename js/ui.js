@@ -1009,6 +1009,9 @@
   // ---------- Results ----------
   function finish() {
     setAnimating(false);
+    // Clear the turn label so "your turn" / "thinking" no longer shows behind the result dialog
+    const turnEl = $('turn-text');
+    if (turnEl) { turnEl.textContent = ''; turnEl.className = 'turn-me'; }
     const outcome = state.result.outcome;
     $('result-title').textContent = outcome === 'player_win' ? tr('victory') : (outcome === 'ai_win' ? tr('defeat') : tr('draw_game'));
     $('result-title').className = 'result-title ' + outcome;

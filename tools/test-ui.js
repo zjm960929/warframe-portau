@@ -226,6 +226,7 @@ async function main() {
   while (flags().animating && settle < 40) { await sleep(150); settle += 1; }
   await sleep(300);
   check('result overlay shown', !el('result-overlay').classList.contains('hidden'));
+  check('turn label cleared when result opens', el('turn-text').textContent === '');
   const scoreMatch = /(\d+)\D+(\d+)/.exec(el('result-score').textContent);
   check('result score rendered',
     !!scoreMatch && Number(scoreMatch[1]) === state().result.player && Number(scoreMatch[2]) === state().result.ai);
