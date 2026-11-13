@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Warframe Tau card game PORTAU">
   <meta name="theme-color" content="#070b1e">
+  <meta name="color-scheme" content="dark">
   <meta property="og:title" content="PORτAU">
   <meta property="og:description" content="Warframe Tau card game PORTAU">
   <meta property="og:type" content="website">
@@ -16,6 +17,9 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <noscript>
+    <div class="noscript">本游戏需要 JavaScript 才能运行，请在浏览器中启用后刷新页面。<br>This game needs JavaScript. Please enable it and reload the page.</div>
+  </noscript>
   <img class="bg-img" src="images/bg.jpg" alt="">
   <div class="bg-scrim"></div>
   <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="none"></audio>
@@ -86,7 +90,7 @@
 
     <div class="board" id="board"><div class="board-inner" id="board-inner"></div></div>
 
-    <div class="turnbar"><span id="turn-text" class="turn-me">天诺的回合</span></div>
+    <div class="turnbar"><span id="turn-text" class="turn-me" role="status" aria-live="polite">天诺的回合</span></div>
 
     <div class="hand-row player-row" id="player-hand"></div>
 

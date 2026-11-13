@@ -15,6 +15,24 @@ body {
 
 .hidden { display: none !important; }
 
+/* JavaScript disabled: static bilingual fallback, no script can style it further */
+.noscript {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+  max-width: min(560px, 86vw);
+  padding: 18px 24px;
+  border: 1px solid rgba(80, 220, 255, .35);
+  border-radius: 10px;
+  background: rgba(7, 11, 30, .92);
+  color: #dfe8ff;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: center;
+}
+
 /* ---------- 背景 ---------- */
 .bg-img {
   position: fixed;
