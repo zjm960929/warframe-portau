@@ -374,7 +374,7 @@
       div.style.transform = 'translate(' + ex + ',' + ey + ') translate(-50%,-50%) scale(1)';
     }, 30);
     t(function () {
-      layer.removeChild(div);
+      if (div.parentNode) div.parentNode.removeChild(div); // 图层可能已被 clearTimers 清空
       cb();
     }, FLY_DUR[durCls] || 430);
   }
@@ -1119,9 +1119,9 @@
       $('deck-num').textContent = state.deck.length;
       // 克隆卡先同步盖住 4 张旧牌，再错峰下移渐隐（避免先消失后出现的闪烁）
       oldViews.forEach(function (v, i) { if (oldRects[i]) fadeCardDown(v, oldRects[i], i * 70, oldEls[i]); });
-      // 渲染 4 个空占位
+      // 渲染空占位；牌堆不足 4 张时只放实际发到的张数，避免留下空位
       let ph = '';
-      for (let i = 0; i < 4; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
+      for (let i = 0; i < state.hands.player.length; i++) ph += '<div class="pcard gone" id="rhand-' + i + '"></div>';
       $('player-hand').innerHTML = ph;
       // 渐隐完成后逐张发新牌
       t(function () { dealRedrawnHand(); }, 450 + 3 * 70);

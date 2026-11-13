@@ -115,10 +115,8 @@ const documentShim = {
   },
   addEventListener: function () {},
   removeEventListener: function () {},
-  createElement: function (tag) { return new El(''); }
+  createElement: function () { return new El(''); }
 };
-// createElement 重复定义合并
-documentShim.createElement = function () { return new El(''); };
 bodyEl = new El('body');
 documentShim.body = bodyEl;
 
@@ -143,18 +141,6 @@ const flags = function () { return window.__portau.getFlags(); };
 const el = function (id) { return registry[id] || documentShim.getElementById(id); };
 const click = function (id) { el(id).dispatch('click', { target: el(id) }); };
 const num = function (id) { return String(el(id).textContent); };
-
-// 诊断：标记终局来源
-engine.skipTurn = (function (orig) {
-  return function (s) { const r = orig(s); if (s.phase === 'over') console.log('[diag] over via skipTurn'); return r; };
-})(engine.skipTurn);
-engine.playMove = (function (orig) {
-  return function (s, w, m, d) {
-    const r = orig(s, w, m, d);
-    if (s.phase === 'over') console.log('[diag] over via playMove\n' + new Error().stack.split('\n').slice(1, 6).join('\n'));
-    return r;
-  };
-})(engine.playMove);
 
 let passed = 0, failed = 0;
 function check(name, ok) {
@@ -239,9 +225,10 @@ async function main() {
   let settle = 0;
   while (flags().animating && settle < 40) { await sleep(150); settle += 1; }
   await sleep(300);
-  console.log('[diag] result =', JSON.stringify(state().result), '| result-overlay hidden =', el('result-overlay').hasClass('hidden'));
   check('结算层显示', !el('result-overlay').classList.contains('hidden'));
-  check('结算比分渲染', el('result-score').textContent.indexOf('魂主') >= 0);
+  const scoreMatch = /(\d+)\D+(\d+)/.exec(el('result-score').textContent);
+  check('结算比分渲染',
+    !!scoreMatch && Number(scoreMatch[1]) === state().result.player && Number(scoreMatch[2]) === state().result.ai);
   check('动画锁已解锁', flags().animating === false);
 
   // 6. 再来一局
