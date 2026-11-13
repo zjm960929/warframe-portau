@@ -31,8 +31,8 @@
 ### 鬼牌与抢夺
 
 - 鬼牌放进任意空槽，按上表正常计分。
-- 之后谁打出与该槽点数相同的普通牌，就能**抢夺**：普通牌盖住鬼牌，鬼牌回到原主人手中。
-- 抢夺本身 **0 分**，并且不补牌——相当于用一次出牌机会换回一张鬼牌。
+- 之后谁打出与该槽点数相同的普通牌，就能**抢夺**：普通牌盖住鬼牌，这张鬼牌由抢夺者收入手中。
+- 抢夺本身 **0 分**，并且不补牌——相当于用一次出牌机会换一张鬼牌。
 
 ### 没有可出的牌
 
@@ -53,7 +53,7 @@
 ## 特性
 
 - 中英双语界面，一键切换并记住偏好
-- 完整动画：开局抽牌揭示、先手判定、发牌、出牌飞行、摸牌补位、鬼牌飞回、弃牌与整手重摸
+- 完整动画：开局抽牌揭示、先手判定、发牌、出牌飞行、摸牌补位、鬼牌易主、弃牌与整手重摸
 - WebAudio 合成音效 + 本地背景音乐，主菜单与对局内都能开关
 - Tau 科幻风界面；桌面大屏分级放大，窄屏横屏提示，系统开启「减弱动态效果」时关闭装饰性动画
 - 规则说明内嵌 B 站视频（手机端直接跳转 B 站观看）
@@ -172,8 +172,8 @@ A "gap" is the difference between slot indexes; only the two nearest cards on ea
 ### Jokers and Capture
 
 - A Joker may be placed in any empty slot and scores normally by the table above.
-- Whoever later plays the normal card of that slot's rank **captures** it: the rank card covers the Joker, and the Joker returns to its owner's hand.
-- A capture is worth **0 points** and draws no replacement card — you spend a turn to get a Joker back.
+- Whoever later plays the normal card of that slot's rank **captures** it: the rank card covers the Joker, and the capturer takes that Joker into their hand.
+- A capture is worth **0 points** and draws no replacement card — you spend a turn to gain a Joker.
 
 ### When You Have No Legal Move
 
@@ -194,7 +194,7 @@ A "gap" is the difference between slot indexes; only the two nearest cards on ea
 ## Features
 
 - Bilingual UI (Chinese / English) with a one-click toggle that remembers your choice
-- Full animation set: opening draw reveal, first-player showdown, dealing, card flight, draw refill, Joker fly-back, discard and full-hand redraw
+- Full animation set: opening draw reveal, first-player showdown, dealing, card flight, draw refill, Joker changing hands, discard and full-hand redraw
 - WebAudio-synthesised sound effects plus local background music, toggleable from the menu and in game
 - Tau sci-fi look; tiered scaling on large desktop screens, landscape hint on narrow screens, decorative animation disabled under "reduce motion"
 - Rules video embedded from Bilibili (opens on Bilibili on mobile)
